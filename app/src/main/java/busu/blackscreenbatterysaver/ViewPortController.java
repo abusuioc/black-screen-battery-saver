@@ -1,4 +1,4 @@
-package busu.com.blackscreenbatterysaver;
+package busu.blackscreenbatterysaver;
 
 import android.content.Context;
 import android.graphics.Color;

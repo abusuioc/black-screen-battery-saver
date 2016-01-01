@@ -1,4 +1,4 @@
-package busu.com.blackscreenbatterysaver;
+package busu.blackscreenbatterysaver;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;

@@ -1,4 +1,4 @@
-package busu.com.blackscreenbatterysaver;
+package busu.blackscreenbatterysaver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
