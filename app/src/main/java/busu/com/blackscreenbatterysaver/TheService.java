@@ -17,6 +17,7 @@ public class TheService extends Service {
 
     private WindowManager windowManager;
     private View viewPort;
+    private NotificationsHelper mNotifs;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -45,6 +46,10 @@ public class TheService extends Service {
         params.y = 100;
 
         windowManager.addView(viewPort, params);
+
+        //
+        mNotifs = new NotificationsHelper(this);
+        mNotifs.fireNotification(mNotifs.buildServiceStarted());
     }
 
     @Override
