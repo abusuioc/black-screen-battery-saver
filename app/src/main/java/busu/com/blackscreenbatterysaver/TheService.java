@@ -6,7 +6,6 @@ import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
@@ -16,7 +15,7 @@ import android.view.WindowManager;
 public class TheService extends Service {
 
     private WindowManager windowManager;
-    private View viewPort;
+    private ViewPortView viewPort;
     private NotificationsHelper mNotifs;
 
     @Override
@@ -57,5 +56,34 @@ public class TheService extends Service {
         super.onDestroy();
         if (viewPort != null) windowManager.removeView(viewPort);
         Log.i(Starter.TAG, "Service destroyed");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
+            final String action = intent.getAction();
+            if (action != null) {
+                if (action.equals(NotificationsHelper.ACTION_SIZE_1P2)) {
+                    viewPort.setHeigthPercentage(0.5f);
+                } else if (action.equals(NotificationsHelper.ACTION_SIZE_1P3)) {
+                    viewPort.setHeigthPercentage(0.33f);
+                } else if (action.equals(NotificationsHelper.ACTION_POS_TOP)) {
+                    viewPort.setPosition(ViewPortView.TOP);
+                } else if (action.equals(NotificationsHelper.ACTION_POS_CENTER)) {
+                    viewPort.setPosition(ViewPortView.CENTER);
+                } else if (action.equals(NotificationsHelper.ACTION_POS_BOTTOM)) {
+                    viewPort.setPosition(ViewPortView.BOTTOM);
+                } else if (action.equals(NotificationsHelper.ACTION_STOP)) {
+                    stop();
+                }
+            }
+        }
+
+        return START_STICKY;
+    }
+
+    private void stop() {
+        stopSelf();
+        mNotifs.cancelNotification();
     }
 }

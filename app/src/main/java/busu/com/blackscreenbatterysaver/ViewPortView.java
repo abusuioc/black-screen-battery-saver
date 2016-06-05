@@ -21,14 +21,15 @@ public class ViewPortView extends View {
 
     final float DEFAULT_HEIGHT_PERCENTAGE = 0.3f;
 
-    final int TOP = 0;
-    final int BOTTOM = 1;
-    final int LEFT = 2;
-    final int RIGHT = 3;
-    final int CENTER = 4;
+    public final static int TOP = 0;
+    public final static int BOTTOM = 1;
+    public final static int LEFT = 2;
+    public final static int RIGHT = 3;
+    public final static int CENTER = 4;
 
     //TOP, BOTTOM or CENTER
     private int currentPosition = CENTER;
+    private float currentHeightPercentage = DEFAULT_HEIGHT_PERCENTAGE;
 
     public ViewPortView(Context context) {
         super(context);
@@ -55,9 +56,20 @@ public class ViewPortView extends View {
         });
     }
 
+    public void setHeigthPercentage(float currentHeightPercentage) {
+        this.currentHeightPercentage = currentHeightPercentage;
+        setHoleHeight(currentHeightPercentage);
+        applyHoleChanged();
+    }
+
+    public void setPosition(int position) {
+        currentPosition = position;
+        applyHoleChanged();
+    }
+
     private void onClicked() {
         changeHolePosition(lastClickedY < hole.top);
-        applyNewHolePosition();
+        applyHoleChanged();
     }
 
     private void changeHolePosition(boolean hasToMoveUpwards) {
@@ -106,7 +118,7 @@ public class ViewPortView extends View {
 
     /**
      * Applies a new height to the hole, but does no check if the percentage is valid
-     * Always follow it by a #commitPositionToHole or, even better, #applyNewHolePosition
+     * Always follow it by a #commitPositionToHole or, even better, #applyHoleChanged
      *
      * @param percentageOfViewHeight
      */
@@ -119,12 +131,15 @@ public class ViewPortView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         if (w > 0 && h > 0 && w != oldw && h != oldh) {
-            setHoleHeight(DEFAULT_HEIGHT_PERCENTAGE);
-            applyNewHolePosition();
+            setHoleHeight(currentHeightPercentage);
+            applyHoleChanged();
         }
     }
 
-    private void applyNewHolePosition() {
+    /**
+     * Call this when hole's position or size has changed
+     */
+    private void applyHoleChanged() {
         commitPositionToHole();
         adjustBlacks();
         invalidate();
