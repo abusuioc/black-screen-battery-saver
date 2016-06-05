@@ -29,9 +29,9 @@ public class ViewPortView extends View {
     private int currentPosition = Preferences.DEFAULT_HOLE_POSITION;
     private float currentHeightPercentage = Preferences.DEFAULT_HOLE_HEIGHT_PERCENTAGE;
 
-    public ViewPortView(Context context, float initialHoleHeightPercentage, int initialHolePosition) {
+    public ViewPortView(Context context, int initialHoleHeightPercentage, int initialHolePosition) {
         super(context);
-        currentHeightPercentage = initialHoleHeightPercentage;
+        currentHeightPercentage = initialHoleHeightPercentage / 100f;
         currentPosition = initialHolePosition;
         init();
     }
@@ -56,8 +56,8 @@ public class ViewPortView extends View {
 //        });
     }
 
-    public void applyHoleHeigthPercentage(float currentHeightPercentage) {
-        this.currentHeightPercentage = currentHeightPercentage;
+    public void applyHoleHeigthPercentage(int percentage) {
+        this.currentHeightPercentage = percentage / 100f;
         setHoleHeight(currentHeightPercentage);
         applyHoleChanged();
     }

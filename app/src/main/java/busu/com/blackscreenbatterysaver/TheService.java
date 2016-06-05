@@ -14,6 +14,10 @@ import android.view.WindowManager;
  */
 public class TheService extends Service {
 
+    public static boolean isStarted;
+
+    public final static String BROADCAST = "com.busu.blackscreenbatterysaver.STATUS_CHANGED";
+
     private WindowManager windowManager;
     private ViewPortView viewPort;
     private NotificationsHelper mNotifs;
@@ -28,7 +32,6 @@ public class TheService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(StarterActivity.TAG, "Service started");
 
         mPrefs = new Preferences(this);
         viewPort = new ViewPortView(this, mPrefs.getHoleHeightPercentage(), mPrefs.getHolePosition());
@@ -50,13 +53,21 @@ public class TheService extends Service {
         //
         mNotifs = new NotificationsHelper(this);
         mNotifs.fireNotification(mNotifs.buildServiceStarted());
+        //
+        changeStartedStatus(true);
+    }
+
+
+    private void changeStartedStatus(boolean hasToStart) {
+        isStarted = hasToStart;
+        sendBroadcast(new Intent(BROADCAST));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         if (viewPort != null) windowManager.removeView(viewPort);
-        Log.i(StarterActivity.TAG, "Service destroyed");
+        changeStartedStatus(false);
     }
 
     @Override
@@ -81,6 +92,9 @@ public class TheService extends Service {
                     viewPort.applyHolePosition(ViewPortView.BOTTOM);
                 } else if (action.equals(NotificationsHelper.ACTION_STOP)) {
                     stop();
+                } else if (action.equals(NotificationsHelper.ACTION_READPREFS)) {
+                    viewPort.applyHoleHeigthPercentage(mPrefs.getHoleHeightPercentage());
+                    viewPort.applyHolePosition(mPrefs.getHolePosition());
                 }
             }
         }

@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">BlackScreenBatterySaver</string>
+
+    <string name="btn_start">Start</string>
+    <string name="btn_stop">Stop</string>
+    <string name="status_started">started</string>
+    <string name="status_stopped">stopped</string>
 </resources>
