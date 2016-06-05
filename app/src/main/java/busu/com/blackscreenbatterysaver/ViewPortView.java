@@ -19,8 +19,6 @@ public class ViewPortView extends View {
 
     private Paint paintBlack;
 
-    final float DEFAULT_HEIGHT_PERCENTAGE = 0.3f;
-
     public final static int TOP = 0;
     public final static int BOTTOM = 1;
     public final static int LEFT = 2;
@@ -28,11 +26,13 @@ public class ViewPortView extends View {
     public final static int CENTER = 4;
 
     //TOP, BOTTOM or CENTER
-    private int currentPosition = CENTER;
-    private float currentHeightPercentage = DEFAULT_HEIGHT_PERCENTAGE;
+    private int currentPosition = Preferences.DEFAULT_HOLE_POSITION;
+    private float currentHeightPercentage = Preferences.DEFAULT_HOLE_HEIGHT_PERCENTAGE;
 
-    public ViewPortView(Context context) {
+    public ViewPortView(Context context, float initialHoleHeightPercentage, int initialHolePosition) {
         super(context);
+        currentHeightPercentage = initialHoleHeightPercentage;
+        currentPosition = initialHolePosition;
         init();
     }
 
@@ -46,47 +46,47 @@ public class ViewPortView extends View {
         paintBlack.setColor(Color.BLACK);
         paintBlack.setStyle(Paint.Style.FILL);
 
-        setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (lastClickedX >= 0f && lastClickedY >= 0f) {
-                    onClicked();
-                }
-            }
-        });
+//        setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (lastClickedX >= 0f && lastClickedY >= 0f) {
+//                    onClicked();
+//                }
+//            }
+//        });
     }
 
-    public void setHeigthPercentage(float currentHeightPercentage) {
+    public void applyHoleHeigthPercentage(float currentHeightPercentage) {
         this.currentHeightPercentage = currentHeightPercentage;
         setHoleHeight(currentHeightPercentage);
         applyHoleChanged();
     }
 
-    public void setPosition(int position) {
+    public void applyHolePosition(int position) {
         currentPosition = position;
         applyHoleChanged();
     }
 
-    private void onClicked() {
-        changeHolePosition(lastClickedY < hole.top);
-        applyHoleChanged();
-    }
+//    private void onClicked() {
+//        changeHolePosition(lastClickedY < hole.top);
+//        applyHoleChanged();
+//    }
 
-    private void changeHolePosition(boolean hasToMoveUpwards) {
-        if (hasToMoveUpwards) {
-            if (currentPosition == CENTER) {
-                currentPosition = TOP;
-            } else if (currentPosition == BOTTOM) {
-                currentPosition = CENTER;
-            }
-        } else {
-            if (currentPosition == CENTER) {
-                currentPosition = BOTTOM;
-            } else if (currentPosition == TOP) {
-                currentPosition = CENTER;
-            }
-        }
-    }
+//    private void changeHolePosition(boolean hasToMoveUpwards) {
+//        if (hasToMoveUpwards) {
+//            if (currentPosition == CENTER) {
+//                currentPosition = TOP;
+//            } else if (currentPosition == BOTTOM) {
+//                currentPosition = CENTER;
+//            }
+//        } else {
+//            if (currentPosition == CENTER) {
+//                currentPosition = BOTTOM;
+//            } else if (currentPosition == TOP) {
+//                currentPosition = CENTER;
+//            }
+//        }
+//    }
 
     private void commitPositionToHole() {
         float holeTop = hole.top;

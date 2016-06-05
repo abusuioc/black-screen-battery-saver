@@ -11,7 +11,7 @@ import android.view.View;
 /**
  * Created by adibusu on 5/14/16.
  */
-public class Starter extends AppCompatActivity {
+public class StarterActivity extends AppCompatActivity {
 
     public final static String TAG = "BSBS";
 
@@ -38,7 +38,7 @@ public class Starter extends AppCompatActivity {
     public void checkDrawOverlayPermission() {
         /** check if we already  have permission to draw over other apps */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(Starter.this)) {
+            if (!Settings.canDrawOverlays(StarterActivity.this)) {
                 /** if not construct intent to request permission */
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:" + getPackageName()));
@@ -65,7 +65,7 @@ public class Starter extends AppCompatActivity {
     }
 
     private void startService() {
-        startService(new Intent(Starter.this, TheService.class));
+        startService(new Intent(StarterActivity.this, TheService.class));
         finish();
     }
 }

@@ -17,6 +17,7 @@ public class TheService extends Service {
     private WindowManager windowManager;
     private ViewPortView viewPort;
     private NotificationsHelper mNotifs;
+    private Preferences mPrefs;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -27,12 +28,12 @@ public class TheService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(Starter.TAG, "Service started");
+        Log.i(StarterActivity.TAG, "Service started");
+
+        mPrefs = new Preferences(this);
+        viewPort = new ViewPortView(this, mPrefs.getHoleHeightPercentage(), mPrefs.getHolePosition());
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-
-        viewPort = new ViewPortView(this);
-
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -55,7 +56,7 @@ public class TheService extends Service {
     public void onDestroy() {
         super.onDestroy();
         if (viewPort != null) windowManager.removeView(viewPort);
-        Log.i(Starter.TAG, "Service destroyed");
+        Log.i(StarterActivity.TAG, "Service destroyed");
     }
 
     @Override
@@ -64,15 +65,20 @@ public class TheService extends Service {
             final String action = intent.getAction();
             if (action != null) {
                 if (action.equals(NotificationsHelper.ACTION_SIZE_1P2)) {
-                    viewPort.setHeigthPercentage(0.5f);
+                    mPrefs.setHoleHeightPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
+                    viewPort.applyHoleHeigthPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
                 } else if (action.equals(NotificationsHelper.ACTION_SIZE_1P3)) {
-                    viewPort.setHeigthPercentage(0.33f);
+                    mPrefs.setHoleHeightPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
+                    viewPort.applyHoleHeigthPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
                 } else if (action.equals(NotificationsHelper.ACTION_POS_TOP)) {
-                    viewPort.setPosition(ViewPortView.TOP);
+                    mPrefs.setHolePosition(ViewPortView.TOP);
+                    viewPort.applyHolePosition(ViewPortView.TOP);
                 } else if (action.equals(NotificationsHelper.ACTION_POS_CENTER)) {
-                    viewPort.setPosition(ViewPortView.CENTER);
+                    mPrefs.setHolePosition(ViewPortView.CENTER);
+                    viewPort.applyHolePosition(ViewPortView.CENTER);
                 } else if (action.equals(NotificationsHelper.ACTION_POS_BOTTOM)) {
-                    viewPort.setPosition(ViewPortView.BOTTOM);
+                    mPrefs.setHolePosition(ViewPortView.BOTTOM);
+                    viewPort.applyHolePosition(ViewPortView.BOTTOM);
                 } else if (action.equals(NotificationsHelper.ACTION_STOP)) {
                     stop();
                 }
