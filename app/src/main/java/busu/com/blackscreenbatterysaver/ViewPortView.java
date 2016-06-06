@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -72,21 +73,21 @@ public class ViewPortView extends View {
 //        applyHoleChanged();
 //    }
 
-//    private void changeHolePosition(boolean hasToMoveUpwards) {
-//        if (hasToMoveUpwards) {
-//            if (currentPosition == CENTER) {
-//                currentPosition = TOP;
-//            } else if (currentPosition == BOTTOM) {
-//                currentPosition = CENTER;
-//            }
-//        } else {
-//            if (currentPosition == CENTER) {
-//                currentPosition = BOTTOM;
-//            } else if (currentPosition == TOP) {
-//                currentPosition = CENTER;
-//            }
-//        }
-//    }
+    private void changeHolePosition(boolean hasToMoveUpwards) {
+        if (hasToMoveUpwards) {
+            if (currentPosition == CENTER) {
+                currentPosition = TOP;
+            } else if (currentPosition == BOTTOM) {
+                currentPosition = CENTER;
+            }
+        } else {
+            if (currentPosition == CENTER) {
+                currentPosition = BOTTOM;
+            } else if (currentPosition == TOP) {
+                currentPosition = CENTER;
+            }
+        }
+    }
 
     private void commitPositionToHole() {
         float holeTop = hole.top;
@@ -152,26 +153,48 @@ public class ViewPortView extends View {
         }
     }
 
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        if (hole.contains(event.getX(), event.getY())) {
+//            return false;
+//        }
+//        super.onTouchEvent(event);
+//        recordPositionOfClick(event);
+//        return true;
+//    }
+//
+//    private float lastClickedX, lastClickedY;
+//
+//    private void recordPositionOfClick(MotionEvent motionEvent) {
+//        lastClickedX = lastClickedY = -1f;
+//        switch (motionEvent.getAction()) {
+//            case MotionEvent.ACTION_UP:
+//            case MotionEvent.ACTION_MOVE:
+//                lastClickedX = motionEvent.getX();
+//                lastClickedY = motionEvent.getY();
+//                break;
+//        }
+//    }
+
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (hole.contains(event.getX(), event.getY())) {
-            return false;
-        }
-        super.onTouchEvent(event);
-        recordPositionOfClick(event);
-        return true;
-    }
-
-    private float lastClickedX, lastClickedY;
-
-    private void recordPositionOfClick(MotionEvent motionEvent) {
-        lastClickedX = lastClickedY = -1f;
-        switch (motionEvent.getAction()) {
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_MOVE:
-                lastClickedX = motionEvent.getX();
-                lastClickedY = motionEvent.getY();
-                break;
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int keyCode = event.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    changeHolePosition(true);
+                    applyHoleChanged();
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    changeHolePosition(false);
+                    applyHoleChanged();
+                }
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
         }
     }
 

@@ -83,7 +83,9 @@ public class StarterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 saveRadioGroupPrefs();
-                startTheService(NotificationsHelper.ACTION_READPREFS);
+                if (TheService.isStarted) {
+                    startTheService(NotificationsHelper.ACTION_READPREFS);
+                }
             }
         });
 
