@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical">
@@ -27,80 +27,133 @@
             tools:text="started/stopped"
             tools:textColor="@android:color/holo_green_dark" />
 
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Height percentage:"
+            android:textSize="18sp" />
+
+        <RadioGroup
+            android:id="@+id/sRgPercentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/sRbPerHalf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="half (50%)"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/sRbPerThird"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="one third (33%)"
+                android:textSize="18sp" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Position:"
+            android:textSize="18sp" />
+
+        <RadioGroup
+            android:id="@+id/sRgPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/sRbPosTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TOP"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/sRbPosCenter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CENTER"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/sRbPosBottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BOTTOM"
+                android:textSize="18sp" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shake device to:"
+            android:textSize="18sp" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="vertical">
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/sChkShakeStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="start" />
+
+            <CheckBox
+                android:id="@+id/sChkShakeStop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="stop" />
 
             <TextView
+                style="@android:style/Widget.CompoundButton.CheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Height percentage:"
-                android:textSize="18sp" />
-
-            <RadioGroup
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:id="@+id/sRgPercentage">
-
-                <RadioButton
-                    android:id="@+id/sRbPerHalf"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="half (50%)"
-                    android:textSize="18sp" />
-
-                <RadioButton
-                    android:id="@+id/sRbPerThird"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="one third (33%)"
-                    android:textSize="18sp" />
-            </RadioGroup>
+                android:layout_gravity="center_vertical"
+                android:text=" the service" />
         </LinearLayout>
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/sTvShakeSensitivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="vertical">
+            android:text="@string/shakeSensitivity"
+            android:textSize="18sp" />
+        <RadioGroup
+            android:id="@+id/sRgShkSens"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-            <TextView
+            <RadioButton
+                android:id="@+id/sRbSenLow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Position:"
+                android:text="low"
                 android:textSize="18sp" />
 
-            <RadioGroup
+            <RadioButton
+                android:id="@+id/sRbSenMed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:id="@+id/sRgPosition">
+                android:text="medium"
+                android:textSize="18sp" />
 
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TOP"
-                    android:id="@+id/sRbPosTop"
-                    android:textSize="18sp" />
+            <RadioButton
+                android:id="@+id/sRbSenHigh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="high  "
+                android:textSize="18sp" />
+        </RadioGroup>
 
-                <RadioButton
-                    android:id="@+id/sRbPosCenter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="CENTER"
-                    android:textSize="18sp" />
-
-                <RadioButton
-                    android:id="@+id/sRbPosBottom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="BOTTOM"
-                    android:textSize="18sp" />
-            </RadioGroup>
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"

@@ -3,15 +3,18 @@ package busu.com.blackscreenbatterysaver;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.squareup.seismic.ShakeDetector;
+
 /**
  * Created by adibusu on 5/14/16.
  */
-public class TheService extends Service {
+public class TheService extends Service implements ShakeDetector.Listener {
 
     public static boolean isStarted;
 
@@ -21,6 +24,11 @@ public class TheService extends Service {
     private ViewPortView viewPort;
     private NotificationsHelper mNotifs;
     private Preferences mPrefs;
+    private ShakeDetector mShakeDetector;
+
+    public final static String ACTION_READPREFS = "read_prefs";
+    public final static String ACTION_CHANGE_SHAKE_SENSITIVITY = "ch_shk";
+    private final static String CHANGE_SHAKE_EXTRA = "ch_shk_extra";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -54,6 +62,9 @@ public class TheService extends Service {
         mNotifs.fireNotification(mNotifs.buildServiceStarted());
         //
         changeStartedStatus(true);
+
+        //
+        configureShaker();
     }
 
 
@@ -90,10 +101,14 @@ public class TheService extends Service {
                     mPrefs.setHolePosition(ViewPortView.BOTTOM);
                     viewPort.applyHolePosition(ViewPortView.BOTTOM);
                 } else if (action.equals(NotificationsHelper.ACTION_STOP)) {
-                    stop();
-                } else if (action.equals(NotificationsHelper.ACTION_READPREFS)) {
+                    stopService();
+                } else if (action.equals(ACTION_READPREFS)) {
                     viewPort.applyHoleHeigthPercentage(mPrefs.getHoleHeightPercentage());
                     viewPort.applyHolePosition(mPrefs.getHolePosition());
+                    configureShaker();
+                } else if (action.equals(ACTION_CHANGE_SHAKE_SENSITIVITY)) {
+                    final int shakeSensitivity = intent.getIntExtra(CHANGE_SHAKE_EXTRA, ShakeDetector.SENSITIVITY_MEDIUM);
+                    mShakeDetector.setSensitivity(shakeSensitivity);
                 }
             }
         }
@@ -101,8 +116,35 @@ public class TheService extends Service {
         return START_STICKY;
     }
 
-    private void stop() {
+    private void stopService() {
         stopSelf();
         mNotifs.cancelNotification();
+    }
+
+    @Override
+    public void hearShake() {
+        stopListeningToShakeEvents();
+        stopService();
+    }
+
+    private void configureShaker() {
+        final boolean hasToStopOnShake = mPrefs.hasToStopOnShake();
+        if (hasToStopOnShake) {
+            if (mShakeDetector == null) {
+                SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+                mShakeDetector = new ShakeDetector(this);
+                mShakeDetector.start(sensorManager);
+            }
+            mShakeDetector.setSensitivity(mPrefs.getShakeSensitivity());
+        } else {
+            stopListeningToShakeEvents();
+        }
+    }
+
+    private void stopListeningToShakeEvents() {
+        if (mShakeDetector != null) {
+            mShakeDetector.stop();
+            mShakeDetector = null;
+        }
     }
 }

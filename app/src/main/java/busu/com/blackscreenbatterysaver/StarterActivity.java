@@ -17,6 +17,8 @@ import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.squareup.seismic.ShakeDetector;
+
 import java.util.HashMap;
 
 /**
@@ -29,8 +31,9 @@ public class StarterActivity extends AppCompatActivity {
     private Preferences mPrefs;
 
     private Button mBtnStartStop;
-    private RadioGroup mRgPos, mRgPer;
+    private RadioGroup mRgPos, mRgPer, mRgShakeSens;
     private TextView mStatus;
+    private CheckBox mChkStartOnSh, mChkStopOnSh;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -65,7 +68,7 @@ public class StarterActivity extends AppCompatActivity {
                 if (TheService.isStarted) {
                     startTheService(NotificationsHelper.ACTION_STOP);
                 } else {
-                    saveRadioGroupPrefs();
+                    savePrefsFromComponents();
                     checkDrawOverlayPermission();
                 }
             }
@@ -77,14 +80,22 @@ public class StarterActivity extends AppCompatActivity {
         mRgPos = (RadioGroup) findViewById(R.id.sRgPosition);
         mRgPos.check(mapIds.get(mPrefs.getHolePosition()));
 
+        mRgShakeSens = (RadioGroup) findViewById(R.id.sRgShkSens);
+        mRgShakeSens.check(mapIds.get(mPrefs.getShakeSensitivity()));
+
+        mChkStartOnSh = (CheckBox) findViewById(R.id.sChkShakeStart);
+        mChkStartOnSh.setChecked(mPrefs.hasToStartOnShake());
+
+        mChkStopOnSh = (CheckBox) findViewById(R.id.sChkShakeStop);
+        mChkStopOnSh.setChecked(mPrefs.hasToStopOnShake());
 
         Button btnApply = (Button) findViewById(R.id.sBtnApply);
         btnApply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveRadioGroupPrefs();
+                savePrefsFromComponents();
                 if (TheService.isStarted) {
-                    startTheService(NotificationsHelper.ACTION_READPREFS);
+                    startTheService(TheService.ACTION_READPREFS);
                 }
             }
         });
@@ -94,9 +105,12 @@ public class StarterActivity extends AppCompatActivity {
         serviceStatusChanged();
     }
 
-    private void saveRadioGroupPrefs() {
+    private void savePrefsFromComponents() {
         mPrefs.setHolePosition(mapIds.get(mRgPos.getCheckedRadioButtonId()));
         mPrefs.setHoleHeightPercentage(mapIds.get(mRgPer.getCheckedRadioButtonId()));
+        mPrefs.setShakeSensitivity(mapIds.get(mRgShakeSens.getCheckedRadioButtonId()));
+        mPrefs.setStartOnShake(mChkStartOnSh.isChecked());
+        mPrefs.setStopOnShake(mChkStopOnSh.isChecked());
     }
 
     @Override
@@ -161,7 +175,7 @@ public class StarterActivity extends AppCompatActivity {
     private HashMap<Integer, Integer> mapIds;
 
     private void initMapIds() {
-        mapIds = new HashMap<>((3 + 2) * 2 + 1);
+        mapIds = new HashMap<>((3 + 3 + 2) * 2 + 1);
         mapIds.put(R.id.sRbPerHalf, Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
         mapIds.put(R.id.sRbPerThird, Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
         mapIds.put(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3, R.id.sRbPerThird);
@@ -172,6 +186,13 @@ public class StarterActivity extends AppCompatActivity {
         mapIds.put(ViewPortView.CENTER, R.id.sRbPosCenter);
         mapIds.put(R.id.sRbPosTop, ViewPortView.TOP);
         mapIds.put(ViewPortView.TOP, R.id.sRbPosTop);
+        mapIds.put(R.id.sRbSenLow, ShakeDetector.SENSITIVITY_LIGHT);
+        mapIds.put(R.id.sRbSenMed, ShakeDetector.SENSITIVITY_MEDIUM);
+        mapIds.put(R.id.sRbSenHigh, ShakeDetector.SENSITIVITY_HARD);
+        mapIds.put(ShakeDetector.SENSITIVITY_LIGHT, R.id.sRbSenLow);
+        mapIds.put(ShakeDetector.SENSITIVITY_MEDIUM, R.id.sRbSenMed);
+        mapIds.put(ShakeDetector.SENSITIVITY_HARD, R.id.sRbSenHigh);
+
     }
 
 

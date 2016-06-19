@@ -20,7 +20,6 @@ public class NotificationsHelper {
     public final static String ACTION_POS_CENTER = "p_center";
     public final static String ACTION_POS_BOTTOM = "p_bottom";
     public final static String ACTION_STOP = "stop";
-    public final static String ACTION_READPREFS = "read_prefs";
 
     private final static int NOTIFICATION_ID = 998822;
 
