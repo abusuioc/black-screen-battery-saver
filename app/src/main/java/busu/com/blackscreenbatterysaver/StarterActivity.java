@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -39,7 +40,9 @@ public class StarterActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null && TheService.BROADCAST.equals(intent.getAction())) {
-                serviceStatusChanged();
+                serviceStatusChanged(
+                        (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_CURRENT_STATE),
+                        (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_OLD_STATE));
             }
         }
     };
@@ -65,7 +68,7 @@ public class StarterActivity extends AppCompatActivity {
         mBtnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (TheService.isStarted) {
+                if (TheService.state == TheService.State.ACTIVE) {
                     startTheService(NotificationsHelper.ACTION_STOP);
                 } else {
                     savePrefsFromComponents();
@@ -94,7 +97,7 @@ public class StarterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 savePrefsFromComponents();
-                if (TheService.isStarted) {
+                if (TheService.state != TheService.State.STOPPED) {
                     startTheService(TheService.ACTION_READPREFS);
                 }
             }
@@ -102,7 +105,7 @@ public class StarterActivity extends AppCompatActivity {
 
         mStatus = (TextView) findViewById(R.id.sStatus);
 
-        serviceStatusChanged();
+        serviceStatusChanged(TheService.state, null);
     }
 
     private void savePrefsFromComponents() {
@@ -125,36 +128,31 @@ public class StarterActivity extends AppCompatActivity {
         unregisterReceiver(mReceiver);
     }
 
-    /**
-     * code to post/handler request for permission
-     */
     public final static int REQUEST_CODE = 1;
 
     public void checkDrawOverlayPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(StarterActivity.this)) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, REQUEST_CODE);
-            } else {
-                startTheService();
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(StarterActivity.this)) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, REQUEST_CODE);
+        } else {
+            startTheService();
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (Settings.canDrawOverlays(this)) {
-                    startTheService();
-                }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(StarterActivity.this)) {
+                startTheService();
+            } else {
+                Snackbar.make(mBtnStartStop, R.string.pleaseEnableOverlay, Snackbar.LENGTH_LONG).show();
             }
         }
     }
 
     private void startTheService() {
-        startTheService(null);
+        startTheService(NotificationsHelper.ACTION_START);
     }
 
     private void startTheService(String action) {
@@ -164,8 +162,8 @@ public class StarterActivity extends AppCompatActivity {
         }
     }
 
-    private void serviceStatusChanged() {
-        final boolean isStarted = TheService.isStarted;
+    private void serviceStatusChanged(TheService.State currentState, TheService.State oldState) {
+        final boolean isStarted = (TheService.State.ACTIVE == currentState);
         //
         mBtnStartStop.setText(isStarted ? R.string.btn_stop : R.string.btn_start);
         mStatus.setText(isStarted ? R.string.status_started : R.string.status_stopped);

@@ -7,4 +7,5 @@
     <string name="status_stopped">stopped</string>
 
     <string name="shakeSensitivity">Shake sensitivity:</string>
+    <string name="pleaseEnableOverlay">Please allow us to draw on top of other apps so that we can start saving battery right away.</string>
 </resources>

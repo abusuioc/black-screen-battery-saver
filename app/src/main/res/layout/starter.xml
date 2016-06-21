@@ -93,12 +93,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Shake device to:"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <CheckBox
                 android:id="@+id/sChkShakeStart"
@@ -125,12 +127,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/shakeSensitivity"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:visibility="gone" />
+
         <RadioGroup
             android:id="@+id/sRgShkSens"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <RadioButton
                 android:id="@+id/sRbSenLow"
