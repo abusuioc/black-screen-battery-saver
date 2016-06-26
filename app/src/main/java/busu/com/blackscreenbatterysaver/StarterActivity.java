@@ -11,14 +11,13 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-
-import com.squareup.seismic.ShakeDetector;
 
 import java.util.HashMap;
 
@@ -32,9 +31,8 @@ public class StarterActivity extends AppCompatActivity {
     private Preferences mPrefs;
 
     private Button mBtnStartStop;
-    private RadioGroup mRgPos, mRgPer, mRgShakeSens;
+    private RadioGroup mRgPos, mRgPer;
     private TextView mStatus;
-    private CheckBox mChkStartOnSh, mChkStopOnSh;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -78,19 +76,10 @@ public class StarterActivity extends AppCompatActivity {
         });
 
         mRgPer = (RadioGroup) findViewById(R.id.sRgPercentage);
-        mRgPer.check(mapIds.get(mPrefs.getHoleHeightPercentage()));
+        mRgPer.check(mMapHeight.get(mPrefs.getHoleHeightPercentage()));
 
         mRgPos = (RadioGroup) findViewById(R.id.sRgPosition);
-        mRgPos.check(mapIds.get(mPrefs.getHolePosition()));
-
-        mRgShakeSens = (RadioGroup) findViewById(R.id.sRgShkSens);
-        mRgShakeSens.check(mapIds.get(mPrefs.getShakeSensitivity()));
-
-        mChkStartOnSh = (CheckBox) findViewById(R.id.sChkShakeStart);
-        mChkStartOnSh.setChecked(mPrefs.hasToStartOnShake());
-
-        mChkStopOnSh = (CheckBox) findViewById(R.id.sChkShakeStop);
-        mChkStopOnSh.setChecked(mPrefs.hasToStopOnShake());
+        mRgPos.check(mMapGravity.get(mPrefs.getHolePosition()));
 
         Button btnApply = (Button) findViewById(R.id.sBtnApply);
         btnApply.setOnClickListener(new View.OnClickListener() {
@@ -109,11 +98,8 @@ public class StarterActivity extends AppCompatActivity {
     }
 
     private void savePrefsFromComponents() {
-        mPrefs.setHolePosition(mapIds.get(mRgPos.getCheckedRadioButtonId()));
-        mPrefs.setHoleHeightPercentage(mapIds.get(mRgPer.getCheckedRadioButtonId()));
-        mPrefs.setShakeSensitivity(mapIds.get(mRgShakeSens.getCheckedRadioButtonId()));
-        mPrefs.setStartOnShake(mChkStartOnSh.isChecked());
-        mPrefs.setStopOnShake(mChkStopOnSh.isChecked());
+        mPrefs.setHolePosition(mMapGravity.get(mRgPos.getCheckedRadioButtonId()));
+        mPrefs.setHoleHeightPercentage(mMapHeight.get(mRgPer.getCheckedRadioButtonId()));
     }
 
     @Override
@@ -170,27 +156,22 @@ public class StarterActivity extends AppCompatActivity {
         mStatus.setTextColor(isStarted ? Color.GREEN : Color.RED);
     }
 
-    private HashMap<Integer, Integer> mapIds;
+    private HashMap<Integer, Integer> mMapHeight;
+    private HashMap<Integer, Integer> mMapGravity;
 
     private void initMapIds() {
-        mapIds = new HashMap<>((3 + 3 + 2) * 2 + 1);
-        mapIds.put(R.id.sRbPerHalf, Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
-        mapIds.put(R.id.sRbPerThird, Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
-        mapIds.put(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3, R.id.sRbPerThird);
-        mapIds.put(Preferences.HOLE_HEIGHT_PERCENTAGE_1P2, R.id.sRbPerHalf);
-        mapIds.put(R.id.sRbPosBottom, ViewPortView.BOTTOM);
-        mapIds.put(ViewPortView.BOTTOM, R.id.sRbPosBottom);
-        mapIds.put(R.id.sRbPosCenter, ViewPortView.CENTER);
-        mapIds.put(ViewPortView.CENTER, R.id.sRbPosCenter);
-        mapIds.put(R.id.sRbPosTop, ViewPortView.TOP);
-        mapIds.put(ViewPortView.TOP, R.id.sRbPosTop);
-        mapIds.put(R.id.sRbSenLow, ShakeDetector.SENSITIVITY_LIGHT);
-        mapIds.put(R.id.sRbSenMed, ShakeDetector.SENSITIVITY_MEDIUM);
-        mapIds.put(R.id.sRbSenHigh, ShakeDetector.SENSITIVITY_HARD);
-        mapIds.put(ShakeDetector.SENSITIVITY_LIGHT, R.id.sRbSenLow);
-        mapIds.put(ShakeDetector.SENSITIVITY_MEDIUM, R.id.sRbSenMed);
-        mapIds.put(ShakeDetector.SENSITIVITY_HARD, R.id.sRbSenHigh);
-
+        mMapHeight = new HashMap<>();
+        mMapHeight.put(R.id.sRbPerHalf, Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
+        mMapHeight.put(R.id.sRbPerThird, Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
+        mMapHeight.put(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3, R.id.sRbPerThird);
+        mMapHeight.put(Preferences.HOLE_HEIGHT_PERCENTAGE_1P2, R.id.sRbPerHalf);
+        mMapGravity = new HashMap<>();
+        mMapGravity.put(R.id.sRbPosBottom, Gravity.BOTTOM);
+        mMapGravity.put(Gravity.BOTTOM, R.id.sRbPosBottom);
+        mMapGravity.put(R.id.sRbPosCenter, Gravity.CENTER);
+        mMapGravity.put(Gravity.CENTER, R.id.sRbPosCenter);
+        mMapGravity.put(R.id.sRbPosTop, Gravity.TOP);
+        mMapGravity.put(Gravity.TOP, R.id.sRbPosTop);
     }
 
 
