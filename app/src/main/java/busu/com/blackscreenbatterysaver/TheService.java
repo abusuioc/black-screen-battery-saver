@@ -2,6 +2,7 @@ package busu.com.blackscreenbatterysaver;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.IBinder;
 import android.view.Gravity;
 
@@ -132,13 +133,12 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
     }
 
     @Override
-    public void onBlackClicked(ViewPortController.ViewLayout black) {
-        LogUtil.logService("Click on " + black.gravity);
-        if(black.gravity == Gravity.TOP) {
-            mVpCtrl.changeHoleGravity(true);
-        }else if(black.gravity == Gravity.BOTTOM) {
-            mVpCtrl.changeHoleGravity(false);
-        }
+    public void onBlackClicked(ViewPortController.ViewLayout black, float clickVerticalRatio) {
+        boolean isCenterRequested = (clickVerticalRatio <= 0.5f && black.gravity == Gravity.BOTTOM)
+                || (clickVerticalRatio > 0.5f && black.gravity == Gravity.TOP);
+        mVpCtrl.changeHoleGravity(isCenterRequested, black.gravity);
+        LogUtil.logService("Click on: " + black.toString() + ", center req: " + isCenterRequested + ", hole gravity: "
+                + ViewPortController.getGravityString(mVpCtrl.getHoleGravity()));
     }
 
     @Override
@@ -146,6 +146,13 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
 
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        LogUtil.logService("Configuration changed ");
+        removeViewPort();
+        mVpCtrl = new ViewPortController(this, this);
+        addViewPort();
+    }
 
     enum State {
         STOPPED,

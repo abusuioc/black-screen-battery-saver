@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -52,8 +53,9 @@ public class ViewPortController {
     }
 
     protected void changeOfLayoutParamsRequested(ViewLayout black) {
-        mWindowManager.removeView(black.mView);
-        mWindowManager.addView(black.mView, black.mLayoutParams);
+        mWindowManager.updateViewLayout(black.mView, black.mLayoutParams);
+//        mWindowManager.removeView(black.mView);
+//        mWindowManager.addView(black.mView, black.mLayoutParams);
         LogUtil.logService("Ch lparams: " + black.mLayoutParams + " for " + black);
     }
 
@@ -83,20 +85,11 @@ public class ViewPortController {
         }
     }
 
-
-    public void changeHoleGravity(boolean hasToMoveUpwards) {
-        if (hasToMoveUpwards) {
-            if (mHoleGravity == Gravity.CENTER) {
-                mHoleGravity = Gravity.TOP;
-            } else if (mHoleGravity == Gravity.BOTTOM) {
-                mHoleGravity = Gravity.CENTER;
-            }
+    public void changeHoleGravity(boolean centerRequested, int requesterGravity) {
+        if (mHoleGravity == Gravity.CENTER || !centerRequested) {
+            mHoleGravity = requesterGravity;
         } else {
-            if (mHoleGravity == Gravity.CENTER) {
-                mHoleGravity = Gravity.BOTTOM;
-            } else if (mHoleGravity == Gravity.TOP) {
-                mHoleGravity = Gravity.CENTER;
-            }
+            mHoleGravity = Gravity.CENTER;
         }
         applyHolePropertiesChanged();
     }
@@ -130,6 +123,21 @@ public class ViewPortController {
         adjustBlacks();
     }
 
+    public int getHoleGravity() {
+        return mHoleGravity;
+    }
+
+    public static String getGravityString(int gravity) {
+        switch (gravity) {
+            case Gravity.TOP:
+                return "TOP";
+            case Gravity.CENTER:
+                return "CENTER";
+            case Gravity.BOTTOM:
+                return "BOTTOM";
+        }
+        return "UNKNOWN GRAVITY: " + gravity;
+    }
 
     public class ViewLayout {
         private View mView;
@@ -153,34 +161,91 @@ public class ViewPortController {
                     getWindowFlags(),
                     PixelFormat.OPAQUE);
             mLayoutParams.gravity = Gravity.LEFT | gravity;
+            disableAnimations();
         }
+
+        /**
+         * Use refletion to disable;
+         * In the current setup where only the height changes and the black are laid using gravity, animations do a weird effect
+         */
+        private void disableAnimations() {
+            try {
+                int currentFlags = (Integer) mLayoutParams.getClass().getField("privateFlags").get(mLayoutParams);
+                mLayoutParams.getClass().getField("privateFlags").set(mLayoutParams, currentFlags | 0x00000040);
+            } catch (Exception e) {
+            }
+        }
+
+        private View.OnLayoutChangeListener mLayoutChangeListener = new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                final int oldWidth = oldRight - oldLeft;
+                final int oldHeight = oldBottom - oldTop;
+                final int newWidth = right - left;
+                final int newHeight = bottom - top;
+                final boolean isTheSame = (newHeight == oldHeight && newWidth == oldWidth);
+                if (!isTheSame) {
+                    v.removeOnLayoutChangeListener(this);
+                    mTotalHeight = newHeight;
+                    applyHeightRatio(mHeightRatio);
+                }
+            }
+        };
 
         private void initView(Context context) {
             mView = new View(context);
             mView.setBackgroundColor(Color.BLACK);
             mView.setDrawingCacheEnabled(true);
             mView.setWillNotDraw(false);
-            mView.setOnClickListener(new View.OnClickListener() {
+            mView.setOnTouchListener(new View.OnTouchListener() {
+                private static final int MAX_CLICK_DURATION_MS = 1000;
+                private static final int MAX_CLICK_DISTANCE_DP = 15;
+
+                private long pressStartTime;
+                private float pressedX;
+                private float pressedY;
+                private boolean stayedWithinClickDistance;
+
                 @Override
-                public void onClick(View v) {
-                    mClickListener.onBlackClicked(ViewLayout.this);
-                }
-            });
-            mView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                    final int oldWidth = oldRight - oldLeft;
-                    final int oldHeight = oldBottom - oldTop;
-                    final int newWidth = right - left;
-                    final int newHeight = bottom - top;
-                    final boolean isTheSame = (newHeight == oldHeight && newWidth == oldWidth);
-                    if (!isTheSame) {
-                        v.removeOnLayoutChangeListener(this);
-                        mTotalHeight = newHeight;
-                        applyHeightRatio(mHeightRatio);
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN: {
+                            pressStartTime = System.currentTimeMillis();
+                            pressedX = event.getX();
+                            pressedY = event.getY();
+                            stayedWithinClickDistance = true;
+                            break;
+                        }
+                        case MotionEvent.ACTION_MOVE: {
+                            if (stayedWithinClickDistance && distance(pressedX, pressedY, event.getX(), event.getY()) > MAX_CLICK_DISTANCE_DP) {
+                                stayedWithinClickDistance = false;
+                            }
+                            break;
+                        }
+                        case MotionEvent.ACTION_UP: {
+                            long pressDuration = System.currentTimeMillis() - pressStartTime;
+                            if (pressDuration < MAX_CLICK_DURATION_MS && stayedWithinClickDistance) {
+                                // Click event has occurred
+                                mClickListener.onBlackClicked(ViewLayout.this, pressedY / mView.getHeight());
+                            }
+                        }
                     }
+                    return true;
+                }
+
+                private float distance(float x1, float y1, float x2, float y2) {
+                    float dx = x1 - x2;
+                    float dy = y1 - y2;
+                    float distanceInPx = (float) Math.sqrt(dx * dx + dy * dy);
+                    return pxToDp(distanceInPx);
+                }
+
+                private float pxToDp(float px) {
+                    return px / mView.getResources().getDisplayMetrics().density;
                 }
             });
+            mView.addOnLayoutChangeListener(mLayoutChangeListener);
         }
 
         public void applyHeightRatio(float ratio) {
@@ -188,15 +253,26 @@ public class ViewPortController {
             if (mTotalHeight > 0) {
                 //after we know
                 mLayoutParams.height = (int) (mTotalHeight * mHeightRatio);
+                if (mLayoutParams.height == 0) {
+                    //not repainting for width = 0; TODO switch to position based resizing effect (constant height, adjust y)
+                    mLayoutParams.height = 1;
+                }
                 changeOfLayoutParamsRequested(this);
             } else {
                 //just set the height ratio
             }
         }
+
+        @Override
+        public String toString() {
+            final String gravityString = getGravityString(gravity);
+            return "Black_" + gravityString;
+        }
+
     }
 
     public interface OnTouchEvents {
-        void onBlackClicked(ViewLayout black);
+        void onBlackClicked(ViewLayout black, float clickVerticalRatio);
 
         void onCloseClicked();
     }
