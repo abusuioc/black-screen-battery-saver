@@ -16,9 +16,6 @@ public class NotificationsHelper {
 
     public final static String ACTION_SIZE_1P2 = "1p2";
     public final static String ACTION_SIZE_1P3 = "1p3";
-    public final static String ACTION_POS_TOP = "p_top";
-    public final static String ACTION_POS_CENTER = "p_center";
-    public final static String ACTION_POS_BOTTOM = "p_bottom";
     public final static String ACTION_STOP = "stop";
     public final static String ACTION_START = "start";
 
@@ -35,32 +32,18 @@ public class NotificationsHelper {
     private NotificationCompat.Builder createBuilder() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mService);
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
-        builder.setSmallIcon(android.R.drawable.ic_media_play);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            // build a complex notification, with buttons and such
-            //
-            RemoteViews body = getComplexNotificationView();
-            builder.setContent(body);
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        RemoteViews body = getComplexNotificationView();
+        builder.setContent(body);
 
-            PendingIntent intent1p2 = buildPendingIntentFor(ACTION_SIZE_1P2);
-            PendingIntent intent1p3 = buildPendingIntentFor(ACTION_SIZE_1P3);
-            PendingIntent intentPtop = buildPendingIntentFor(ACTION_POS_TOP);
-            PendingIntent intentPcenter = buildPendingIntentFor(ACTION_POS_CENTER);
-            PendingIntent intentPbottom = buildPendingIntentFor(ACTION_POS_BOTTOM);
-            PendingIntent intentStop = buildPendingIntentFor(ACTION_STOP);
+        PendingIntent intent1p2 = buildPendingIntentFor(ACTION_SIZE_1P2);
+        PendingIntent intent1p3 = buildPendingIntentFor(ACTION_SIZE_1P3);
+        PendingIntent intentStop = buildPendingIntentFor(ACTION_STOP);
 
-            body.setOnClickPendingIntent(R.id.notifSize1p2, intent1p2);
-            body.setOnClickPendingIntent(R.id.notifSize1p3, intent1p3);
-            body.setOnClickPendingIntent(R.id.notifPosUp, intentPtop);
-            body.setOnClickPendingIntent(R.id.notifPosCenter, intentPcenter);
-            body.setOnClickPendingIntent(R.id.notifPosDown, intentPbottom);
-            body.setOnClickPendingIntent(R.id.notifStop, intentStop);
-        } else {
-            // Build a simpler notification, without buttons
-            //
-            builder.setContentTitle("title")
-                    .setContentText("content");
-        }
+        body.setOnClickPendingIntent(R.id.notifSize1p2, intent1p2);
+        body.setOnClickPendingIntent(R.id.notifSize1p3, intent1p3);
+        body.setOnClickPendingIntent(R.id.notifStop, intentStop);
+        body.setOnClickPendingIntent(R.id.notifSettings, buildShowSettingsPendingIntent());
         builder.setAutoCancel(false);
         builder.setOngoing(true);
         return builder;
@@ -72,17 +55,22 @@ public class NotificationsHelper {
         return pendingIntent;
     }
 
+    private PendingIntent buildShowSettingsPendingIntent() {
+        Intent intent = new Intent(mService, StarterActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        return PendingIntent.getActivity(mService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
     private RemoteViews getComplexNotificationView() {
         RemoteViews notificationView = new RemoteViews(
                 mService.getPackageName(),
                 R.layout.notification);
-
         return notificationView;
     }
 
     public NotificationCompat.Builder buildServiceStarted() {
         NotificationCompat.Builder builder = createBuilder();
-        builder.setTicker("Service started");
+        builder.setTicker(mService.getResources().getString(R.string.service_started));
         return builder;
     }
 

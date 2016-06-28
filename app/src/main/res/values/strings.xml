@@ -4,6 +4,7 @@
     <string name="btn_start">Start</string>
     <string name="btn_stop">Stop</string>
     <string name="status_started">started</string>
+    <string name="service_started">Service started</string>
     <string name="status_stopped">stopped</string>
 
     <string name="shakeSensitivity">Shake sensitivity:</string>

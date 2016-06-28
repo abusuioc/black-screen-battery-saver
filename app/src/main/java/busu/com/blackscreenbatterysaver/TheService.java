@@ -96,15 +96,6 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
                 } else if (action.equals(NotificationsHelper.ACTION_SIZE_1P3)) {
                     mPrefs.setHoleHeightPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
                     mVpCtrl.applyHoleHeigthPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
-                } else if (action.equals(NotificationsHelper.ACTION_POS_TOP)) {
-                    mPrefs.setHolePosition(Gravity.TOP);
-                    mVpCtrl.applyHoleVerticalGravity(Gravity.TOP);
-                } else if (action.equals(NotificationsHelper.ACTION_POS_CENTER)) {
-                    mPrefs.setHolePosition(Gravity.CENTER);
-                    mVpCtrl.applyHoleVerticalGravity(Gravity.CENTER);
-                } else if (action.equals(NotificationsHelper.ACTION_POS_BOTTOM)) {
-                    mPrefs.setHolePosition(Gravity.BOTTOM);
-                    mVpCtrl.applyHoleVerticalGravity(Gravity.BOTTOM);
                 } else if (action.equals(NotificationsHelper.ACTION_STOP)) {
 //                    changeServiceState(State.STANDBY);
                     // ^ ok in the scenario in which we allow service to live forever
