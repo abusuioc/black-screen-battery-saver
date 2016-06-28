@@ -134,7 +134,7 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
 
     @Override
     public void onCloseClicked() {
-
+        changeServiceState(State.STOPPED);
     }
 
     @Override

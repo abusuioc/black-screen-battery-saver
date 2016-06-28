@@ -4,10 +4,14 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +24,7 @@ public class ViewPortController {
     private final Map<Integer, ViewLayout> mBlacks = new HashMap<>(4);
     private final OnTouchEvents mClickListener;
     private final WindowManager mWindowManager;
+    private final View mCloseButton;
 
     //Gravity. TOP, BOTTOM or CENTER
     private int mHoleGravity = Preferences.DEFAULT_HOLE_POSITION;
@@ -30,6 +35,13 @@ public class ViewPortController {
         mBlacks.put(Gravity.BOTTOM, new ViewLayout(context, Gravity.BOTTOM));
         mClickListener = listener;
         mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        mCloseButton = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.close_button, null);
+        mCloseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mClickListener.onCloseClicked();
+            }
+        });
     }
 
     /**
@@ -121,7 +133,17 @@ public class ViewPortController {
      */
     private void applyHolePropertiesChanged() {
         adjustBlacks();
+        positionCloseButton();
     }
+
+    private void positionCloseButton() {
+        if (mHoleGravity == Gravity.BOTTOM) {
+            mBlacks.get(Gravity.TOP).showCloseButton();
+        } else {
+            mBlacks.get(Gravity.BOTTOM).showCloseButton();
+        }
+    }
+
 
     public int getHoleGravity() {
         return mHoleGravity;
@@ -140,7 +162,7 @@ public class ViewPortController {
     }
 
     public class ViewLayout {
-        private View mView;
+        private ViewGroup mView;
         private WindowManager.LayoutParams mLayoutParams;
         private boolean isAdded;
         public int gravity;
@@ -194,7 +216,7 @@ public class ViewPortController {
         };
 
         private void initView(Context context) {
-            mView = new View(context);
+            mView = new FrameLayout(context);
             mView.setBackgroundColor(Color.BLACK);
             mView.setDrawingCacheEnabled(true);
             mView.setWillNotDraw(false);
@@ -269,6 +291,15 @@ public class ViewPortController {
             return "Black_" + gravityString;
         }
 
+        protected void showCloseButton() {
+            ViewGroup parent = (ViewGroup) mCloseButton.getParent();
+            if (parent != null) {
+                parent.removeView(mCloseButton);
+            }
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.gravity = gravity | Gravity.RIGHT;
+            mView.addView(mCloseButton, lp);
+        }
     }
 
     public interface OnTouchEvents {
