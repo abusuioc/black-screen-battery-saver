@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -14,30 +14,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Service status:"
-            android:textSize="18sp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:gravity="center"
+            android:text="@string/welcome"
+            android:textSize="20sp" />
 
         <TextView
+            android:layout_marginTop="10dp"
             android:id="@+id/sStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:textSize="22sp"
             tools:text="started/stopped"
             tools:textColor="@android:color/holo_green_dark" />
 
+        <Button
+            android:id="@+id/sBtnStartStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:text="Start/Stop" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Height percentage:"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="@string/starter_height_text"
             android:textSize="18sp" />
 
         <RadioGroup
             android:id="@+id/sRgPercentage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:orientation="horizontal">
 
             <RadioButton
@@ -58,13 +71,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Position:"
+            android:layout_gravity="center"
+            android:text="@string/starter_position_text"
             android:textSize="18sp" />
 
         <RadioGroup
             android:id="@+id/sRgPosition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:orientation="horizontal">
 
             <RadioButton
@@ -89,35 +104,13 @@
                 android:textSize="18sp" />
         </RadioGroup>
 
-
-
-        <LinearLayout
+        <Button
+            android:id="@+id/sBtnTutorial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20sp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/sBtnStartStop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Start/Stop" />
-
-            <Button
-                android:id="@+id/sBtnApply"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Apply" />
-        </LinearLayout>
-
-        <CheckBox
-            android:id="@+id/sChkClose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="... and close this"
-            android:textSize="16sp" />
+            android:layout_gravity="center"
+            android:layout_marginTop="10sp"
+            android:text="@string/starter_restart_tutorial" />
     </LinearLayout>
 
-</FrameLayout>
+</ScrollView>

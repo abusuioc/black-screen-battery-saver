@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.support.v7.app.NotificationCompat;
 import android.widget.RemoteViews;
 
@@ -13,11 +12,6 @@ import android.widget.RemoteViews;
  * Created by adibusu on 5/30/16.
  */
 public class NotificationsHelper {
-
-    public final static String ACTION_SIZE_1P2 = "1p2";
-    public final static String ACTION_SIZE_1P3 = "1p3";
-    public final static String ACTION_STOP = "stop";
-    public final static String ACTION_START = "start";
 
     private final static int NOTIFICATION_ID = 998822;
 
@@ -36,14 +30,16 @@ public class NotificationsHelper {
         RemoteViews body = getComplexNotificationView();
         builder.setContent(body);
 
-        PendingIntent intent1p2 = buildPendingIntentFor(ACTION_SIZE_1P2);
-        PendingIntent intent1p3 = buildPendingIntentFor(ACTION_SIZE_1P3);
-        PendingIntent intentStop = buildPendingIntentFor(ACTION_STOP);
+        PendingIntent intent1p2 = buildPendingIntentFor(TheService.ACTION_SIZE_1P2);
+        PendingIntent intent1p3 = buildPendingIntentFor(TheService.ACTION_SIZE_1P3);
+        PendingIntent intentStop = buildPendingIntentFor(TheService.ACTION_STOP);
+        PendingIntent intentTutorial = buildPendingIntentFor(TheService.ACTION_TUTORIAL);
 
         body.setOnClickPendingIntent(R.id.notifSize1p2, intent1p2);
         body.setOnClickPendingIntent(R.id.notifSize1p3, intent1p3);
         body.setOnClickPendingIntent(R.id.notifStop, intentStop);
         body.setOnClickPendingIntent(R.id.notifSettings, buildShowSettingsPendingIntent());
+        body.setOnClickPendingIntent(R.id.notifTutorial, intentTutorial);
         builder.setAutoCancel(false);
         builder.setOngoing(true);
         return builder;

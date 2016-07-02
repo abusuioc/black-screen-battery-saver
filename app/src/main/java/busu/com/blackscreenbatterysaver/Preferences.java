@@ -12,7 +12,7 @@ public class Preferences {
 
     private final static String KEY_HEIGHT = "kh";
     private final static String KEY_POS = "kp";
-    private final static String KEY_BTN_CLOSE = "kbnc";
+    private final static String KEY_TUTORIAL = "ktut";
 
     private SharedPreferences mPrefs;
 
@@ -32,23 +32,23 @@ public class Preferences {
         mPrefs.edit().putInt(KEY_HEIGHT, holeHeightPercentage).apply();
     }
 
-    public final static int DEFAULT_HOLE_POSITION = Gravity.BOTTOM;
+    public final static int DEFAULT_HOLE_GRAVITY = Gravity.BOTTOM;
 
-    public int getHolePosition() {
-        return mPrefs.getInt(KEY_POS, DEFAULT_HOLE_POSITION);
+    public int getHoleGravity() {
+        return mPrefs.getInt(KEY_POS, DEFAULT_HOLE_GRAVITY);
     }
 
-    public void setHolePosition(int holePosition) {
+    public void setHoleGravity(int holePosition) {
         mPrefs.edit().putInt(KEY_POS, holePosition).apply();
     }
 
-    public final static boolean DEFAULT_BTN_CLOSE = false;
+    public final static boolean DEFAULT_SHOW_TUTORIAL = true;
 
-    public boolean hasToCloseAfterButtonPressed() {
-        return mPrefs.getBoolean(KEY_BTN_CLOSE, DEFAULT_BTN_CLOSE);
+    public boolean hasToShowTutorial() {
+        return mPrefs.getBoolean(KEY_TUTORIAL, DEFAULT_SHOW_TUTORIAL);
     }
 
-    public void setHasToCloseAfterButtonPressed(boolean hasToCloseAfterButtonPressed) {
-        mPrefs.edit().putBoolean(KEY_BTN_CLOSE, hasToCloseAfterButtonPressed).apply();
+    public void setHasToShowTutorial(boolean hasToShowTutorial) {
+        mPrefs.edit().putBoolean(KEY_TUTORIAL, hasToShowTutorial).apply();
     }
 }

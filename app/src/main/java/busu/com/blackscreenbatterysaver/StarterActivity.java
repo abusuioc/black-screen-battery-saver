@@ -2,6 +2,7 @@ package busu.com.blackscreenbatterysaver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -10,12 +11,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -30,18 +30,35 @@ public class StarterActivity extends AppCompatActivity {
 
     private Preferences mPrefs;
 
-    private Button mBtnStartStop;
+    private Button mBtnStartStop, mBtnTutorial;
     private RadioGroup mRgPos, mRgPer;
     private TextView mStatus;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent != null && TheService.BROADCAST.equals(intent.getAction())) {
-                serviceStatusChanged(
-                        (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_CURRENT_STATE),
-                        (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_OLD_STATE));
+            if (intent != null) {
+                if (TheService.EVENT_STATUS_CHANGED.equals(intent.getAction())) {
+                    serviceStatusChanged(
+                            (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_CURRENT_STATE),
+                            (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_OLD_STATE));
+                } else if (TheService.EVENT_PROPERTIES_CHANGED.equals(intent.getAction())) {
+                    mRgPer.setOnCheckedChangeListener(null);
+                    mRgPer.check(mMapHeight.get(mPrefs.getHoleHeightPercentage()));
+                    mRgPer.setOnCheckedChangeListener(mCheckListener);
+
+                    mRgPos.setOnCheckedChangeListener(null);
+                    mRgPos.check(mMapGravity.get(mPrefs.getHoleGravity()));
+                    mRgPos.setOnCheckedChangeListener(mCheckListener);
+                }
             }
+        }
+    };
+
+    RadioGroup.OnCheckedChangeListener mCheckListener = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            savePrefsAndAskServiceToApplyThem();
         }
     };
 
@@ -53,21 +70,12 @@ public class StarterActivity extends AppCompatActivity {
 
         setContentView(R.layout.starter);
 
-        CheckBox cbClose = (CheckBox) findViewById(R.id.sChkClose);
-        cbClose.setChecked(mPrefs.hasToCloseAfterButtonPressed());
-        cbClose.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mPrefs.setHasToCloseAfterButtonPressed(isChecked);
-            }
-        });
-
         mBtnStartStop = (Button) findViewById(R.id.sBtnStartStop);
         mBtnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (TheService.state == TheService.State.ACTIVE) {
-                    startTheService(NotificationsHelper.ACTION_STOP);
+                    startTheService(TheService.ACTION_STOP, false);
                 } else {
                     savePrefsFromComponents();
                     checkDrawOverlayPermission();
@@ -75,37 +83,49 @@ public class StarterActivity extends AppCompatActivity {
             }
         });
 
-        mRgPer = (RadioGroup) findViewById(R.id.sRgPercentage);
-        mRgPer.check(mMapHeight.get(mPrefs.getHoleHeightPercentage()));
-
-        mRgPos = (RadioGroup) findViewById(R.id.sRgPosition);
-        mRgPos.check(mMapGravity.get(mPrefs.getHolePosition()));
-
-        Button btnApply = (Button) findViewById(R.id.sBtnApply);
-        btnApply.setOnClickListener(new View.OnClickListener() {
+        mBtnTutorial = (Button) findViewById(R.id.sBtnTutorial);
+        mBtnTutorial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                savePrefsFromComponents();
-                if (TheService.state != TheService.State.STOPPED) {
-                    startTheService(TheService.ACTION_READPREFS);
-                }
+                mPrefs.setHasToShowTutorial(true);
+                startTheService(TheService.ACTION_TUTORIAL, true);
             }
         });
+
+        mRgPer = (RadioGroup) findViewById(R.id.sRgPercentage);
+        mRgPer.check(mMapHeight.get(mPrefs.getHoleHeightPercentage()));
+        mRgPer.setOnCheckedChangeListener(mCheckListener);
+
+        mRgPos = (RadioGroup) findViewById(R.id.sRgPosition);
+        mRgPos.check(mMapGravity.get(mPrefs.getHoleGravity()));
+        mRgPos.setOnCheckedChangeListener(mCheckListener);
 
         mStatus = (TextView) findViewById(R.id.sStatus);
 
         serviceStatusChanged(TheService.state, null);
     }
 
+    /**
+     * Currently save all configurable options and load them in the service for every option available; TODO separate for each
+     */
+    private void savePrefsAndAskServiceToApplyThem() {
+        savePrefsFromComponents();
+        if (TheService.state != TheService.State.STOPPED) {
+            startTheService(TheService.ACTION_READPREFS, false);
+        }
+    }
+
     private void savePrefsFromComponents() {
-        mPrefs.setHolePosition(mMapGravity.get(mRgPos.getCheckedRadioButtonId()));
+        mPrefs.setHoleGravity(mMapGravity.get(mRgPos.getCheckedRadioButtonId()));
         mPrefs.setHoleHeightPercentage(mMapHeight.get(mRgPer.getCheckedRadioButtonId()));
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        registerReceiver(mReceiver, new IntentFilter(TheService.BROADCAST));
+        IntentFilter intentFilter = new IntentFilter(TheService.EVENT_STATUS_CHANGED);
+        intentFilter.addAction(TheService.EVENT_PROPERTIES_CHANGED);
+        registerReceiver(mReceiver, intentFilter);
     }
 
     @Override
@@ -118,9 +138,19 @@ public class StarterActivity extends AppCompatActivity {
 
     public void checkDrawOverlayPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(StarterActivity.this)) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName()));
-            startActivityForResult(intent, REQUEST_CODE);
+            new AlertDialog.Builder(this).setCancelable(true).
+                    setMessage(R.string.overlay_enabling_dialog).
+                    setPositiveButton(R.string.overlay_proceed, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                    Uri.parse("package:" + getPackageName()));
+                            startActivityForResult(intent, REQUEST_CODE);
+                        }
+                    }).
+                    setNegativeButton(R.string.overlay_cancel, null).
+                    create().show();
+
         } else {
             startTheService();
         }
@@ -138,13 +168,21 @@ public class StarterActivity extends AppCompatActivity {
     }
 
     private void startTheService() {
-        startTheService(NotificationsHelper.ACTION_START);
+        startTheService(TheService.ACTION_START, true);
     }
 
-    private void startTheService(String action) {
-        startService(new Intent(StarterActivity.this, TheService.class).setAction(action));
-        if (mPrefs.hasToCloseAfterButtonPressed()) {
-            finish();
+    /**
+     * Start the service only on action start and send commands for the other actions only if the service is already started
+     *
+     * @param action
+     * @param hasToCloseActivity
+     */
+    private void startTheService(String action, boolean hasToCloseActivity) {
+        if (action == TheService.ACTION_START || TheService.state == TheService.State.ACTIVE) {
+            startService(new Intent(StarterActivity.this, TheService.class).setAction(action));
+            if (hasToCloseActivity) {
+                finish();
+            }
         }
     }
 
@@ -154,6 +192,12 @@ public class StarterActivity extends AppCompatActivity {
         mBtnStartStop.setText(isStarted ? R.string.btn_stop : R.string.btn_start);
         mStatus.setText(isStarted ? R.string.status_started : R.string.status_stopped);
         mStatus.setTextColor(isStarted ? Color.GREEN : Color.RED);
+        //
+        if (isStarted) {
+            mBtnTutorial.setVisibility(View.VISIBLE);
+        } else {
+            mBtnTutorial.setVisibility(View.INVISIBLE);
+        }
     }
 
     private HashMap<Integer, Integer> mMapHeight;

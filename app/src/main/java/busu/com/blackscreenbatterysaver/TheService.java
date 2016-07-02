@@ -11,18 +11,28 @@ import android.view.Gravity;
  */
 public class TheService extends Service implements ViewPortController.OnTouchEvents {
 
+    public final static String ACTION_SIZE_1P2 = "1p2";
+    public final static String ACTION_SIZE_1P3 = "1p3";
+    public final static String ACTION_STOP = "stop";
+    public final static String ACTION_START = "start";
+    public final static String ACTION_READPREFS = "read_prefs";
+    public final static String ACTION_TUTORIAL = "tut";
+
     public static State state = State.STOPPED;
 
-    public final static String BROADCAST = "com.busu.blackscreenbatterysaver.STATUS_CHANGED";
+    public final static String EVENT_STATUS_CHANGED = "com.busu.blackscreenbatterysaver.STATUS_CHANGED";
     public final static String BROADCAST_CURRENT_STATE = "cst";
     public final static String BROADCAST_OLD_STATE = "ost";
+    public final static String EVENT_PROPERTIES_CHANGED = "com.busu.blackscreenbatterysaver.PROPS_CHANGED";
 
     private NotificationsHelper mNotifs;
     private Preferences mPrefs;
 
     private ViewPortController mVpCtrl;
 
-    public final static String ACTION_READPREFS = "read_prefs";
+    private int mTutorialStep = 0;
+    private static final int[] TUTORIAL_STEPS = {R.string.tutorial1, R.string.tutorial2};
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -49,7 +59,7 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
             final State oldState = state;
             state = newState;
             applyCurrentServiceState(newState, oldState);
-            sendBroadcast(new Intent(BROADCAST)
+            sendBroadcast(new Intent(EVENT_STATUS_CHANGED)
                     .putExtra(BROADCAST_CURRENT_STATE, newState)
                     .putExtra(BROADCAST_OLD_STATE, oldState));
         }
@@ -81,6 +91,8 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
     public void onDestroy() {
         changeServiceState(State.STOPPED);
         mVpCtrl = null;
+        //force ending of tutorial
+        endTutorial(false);
         super.onDestroy();
     }
 
@@ -90,32 +102,37 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
             final String action = intent.getAction();
             LogUtil.logService("Action received: " + action + " in state: " + state);
             if (action != null) {
-                if (action.equals(NotificationsHelper.ACTION_SIZE_1P2)) {
+                if (action.equals(ACTION_SIZE_1P2)) {
                     mPrefs.setHoleHeightPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
                     mVpCtrl.applyHoleHeigthPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
-                } else if (action.equals(NotificationsHelper.ACTION_SIZE_1P3)) {
+                    sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
+                } else if (action.equals(ACTION_SIZE_1P3)) {
                     mPrefs.setHoleHeightPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
                     mVpCtrl.applyHoleHeigthPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
-                } else if (action.equals(NotificationsHelper.ACTION_STOP)) {
+                    sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
+                } else if (action.equals(ACTION_STOP)) {
 //                    changeServiceState(State.STANDBY);
                     // ^ ok in the scenario in which we allow service to live forever
                     changeServiceState(State.STOPPED);
-                } else if (action.equals(NotificationsHelper.ACTION_START)) {
+                } else if (action.equals(ACTION_START)) {
                     changeServiceState(State.ACTIVE);
                 } else if (action.equals(ACTION_READPREFS)) {
                     mVpCtrl.applyHoleHeigthPercentage(mPrefs.getHoleHeightPercentage());
-                    mVpCtrl.applyHoleVerticalGravity(mPrefs.getHolePosition());
+                    mVpCtrl.applyHoleVerticalGravity(mPrefs.getHoleGravity());
+                } else if (action.equals(ACTION_TUTORIAL)) {
+                    loadTutorial();
                 }
+                sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
             }
         }
 
         return START_STICKY;
     }
 
-
     private void addViewPort() {
         mVpCtrl.applyHoleHeigthPercentage(mPrefs.getHoleHeightPercentage());
-        mVpCtrl.applyHoleVerticalGravity(mPrefs.getHolePosition());
+        mVpCtrl.applyHoleVerticalGravity(mPrefs.getHoleGravity());
+        loadTutorial();
         mVpCtrl.addToWindow();
     }
 
@@ -128,6 +145,9 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
         boolean isCenterRequested = (clickVerticalRatio <= 0.5f && black.gravity == Gravity.BOTTOM)
                 || (clickVerticalRatio > 0.5f && black.gravity == Gravity.TOP);
         mVpCtrl.changeHoleGravity(isCenterRequested, black.gravity);
+        mPrefs.setHoleGravity(mVpCtrl.getHoleGravity());
+        sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
+        incrementTutorial(true);
         LogUtil.logService("Click on: " + black.toString() + ", center req: " + isCenterRequested + ", hole gravity: "
                 + ViewPortController.getGravityString(mVpCtrl.getHoleGravity()));
     }
@@ -149,5 +169,31 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
         STOPPED,
         STANDBY,
         ACTIVE
+    }
+
+    private void loadTutorial() {
+        if (mPrefs.hasToShowTutorial()) {
+            mTutorialStep = 0;
+            mVpCtrl.showTutorial(TUTORIAL_STEPS[mTutorialStep]);
+        }
+    }
+
+    private void incrementTutorial(boolean hasToUpdateViewController) {
+        if (mPrefs.hasToShowTutorial()) {
+            mTutorialStep++;
+            if (mTutorialStep >= TUTORIAL_STEPS.length) {
+                endTutorial(hasToUpdateViewController);
+            } else {
+                mVpCtrl.showTutorial(TUTORIAL_STEPS[mTutorialStep]);
+            }
+        }
+    }
+
+    private void endTutorial(boolean hasToUpdateViewController) {
+        mTutorialStep = TUTORIAL_STEPS.length;
+        if (hasToUpdateViewController) {
+            mVpCtrl.hideTutorial();
+        }
+        mPrefs.setHasToShowTutorial(false);
     }
 }

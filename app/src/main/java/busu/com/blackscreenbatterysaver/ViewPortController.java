@@ -3,15 +3,16 @@ package busu.com.blackscreenbatterysaver;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Typeface;
+import android.support.annotation.StringRes;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,16 +26,24 @@ public class ViewPortController {
     private final OnTouchEvents mClickListener;
     private final WindowManager mWindowManager;
     private final View mCloseButton;
+    private final Context mContext;
+    //used also as flag whether tutorial should be shown or not
+    private Typeface mTutorialFont;
+    @StringRes
+    private int mTutorialText;
 
     //Gravity. TOP, BOTTOM or CENTER
-    private int mHoleGravity = Preferences.DEFAULT_HOLE_POSITION;
+    private int mHoleGravity = Preferences.DEFAULT_HOLE_GRAVITY;
     private float mHoleHeightRatio = Preferences.DEFAULT_HOLE_HEIGHT_PERCENTAGE / 100f;
 
+
     public ViewPortController(Context context, OnTouchEvents listener) {
+        mContext = context;
         mBlacks.put(Gravity.TOP, new ViewLayout(context, Gravity.TOP));
         mBlacks.put(Gravity.BOTTOM, new ViewLayout(context, Gravity.BOTTOM));
         mClickListener = listener;
         mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        //
         mCloseButton = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.close_button, null);
         mCloseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,6 +143,39 @@ public class ViewPortController {
     private void applyHolePropertiesChanged() {
         adjustBlacks();
         positionCloseButton();
+        positionTutorial();
+    }
+
+    private void positionTutorial() {
+        if (mTutorialFont != null) {
+            switch (mHoleGravity) {
+                case Gravity.TOP:
+                    mBlacks.get(Gravity.BOTTOM).showTutorial(mTutorialText);
+                    mBlacks.get(Gravity.TOP).hideTutorial();
+                    break;
+                case Gravity.CENTER:
+                case Gravity.BOTTOM:
+                    mBlacks.get(Gravity.TOP).showTutorial(mTutorialText);
+                    mBlacks.get(Gravity.BOTTOM).hideTutorial();
+                    break;
+            }
+        }
+    }
+
+    public void showTutorial(@StringRes int tutorialText) {
+        if (mTutorialFont == null) {
+            mTutorialFont = Typeface.createFromAsset(mContext.getAssets(),
+                    "fonts/handwrite.ttf");
+        }
+        mTutorialText = tutorialText;
+        positionTutorial();
+    }
+
+    public void hideTutorial() {
+        mTutorialFont = null;
+        for (ViewLayout black : mBlacks.values()) {
+            black.hideTutorial();
+        }
     }
 
     private void positionCloseButton() {
@@ -168,6 +210,8 @@ public class ViewPortController {
         public int gravity;
         private float mHeightRatio;
         private int mTotalHeight;
+
+        private TextView mTutorialBox;
 
         public ViewLayout(Context context, int gravity) {
             this.gravity = gravity;
@@ -299,6 +343,32 @@ public class ViewPortController {
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             lp.gravity = gravity | Gravity.RIGHT;
             mView.addView(mCloseButton, lp);
+        }
+
+        protected void showTutorial(@StringRes int tutorialText) {
+            if (mTutorialBox == null) {
+                mTutorialBox = new TextView(mView.getContext());
+                mTutorialBox.setTypeface(mTutorialFont);
+                mTutorialBox.setGravity(Gravity.CENTER);
+                mTutorialBox.setSingleLine(false);
+                mTutorialBox.setClickable(false);
+                mTutorialBox.setTextSize(20);
+                //
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.gravity = Gravity.CENTER;
+                mView.addView(mTutorialBox, lp);
+            }
+            mTutorialBox.setText(tutorialText);
+        }
+
+        protected void hideTutorial() {
+            if (mTutorialBox != null) {
+                ViewGroup parent = (ViewGroup) mTutorialBox.getParent();
+                if (parent != null) {
+                    parent.removeView(mTutorialBox);
+                }
+                mTutorialBox = null;
+            }
         }
     }
 
