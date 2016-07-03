@@ -8,15 +8,19 @@
     <string name="status_stopped">stopped</string>
 
     <string name="shakeSensitivity">Shake sensitivity:</string>
-    <string name="overlay_enabling_dialog">The service saves battery by putting screen pixels in off state.\nFor this to work, you\'ll be prompted in the next screen to enable the \'drawing over other apps\' permission.</string>
+    <string name="overlay_enabling_dialog">The service saves battery by putting screen pixels in off state.\n\nFor this to work, you\'ll be prompted in the next screen to enable the \'drawing over other apps\' permission.</string>
     <string name="overlay_proceed">Proceed</string>
     <string name="overlay_cancel">Cancel</string>
-    <string name="pleaseEnableOverlay">Please allow us to draw on top of other apps so that we can start saving battery right away.</string>
-    <string name="tutorial1">Tap outside the viewport to move it there.</string>
-    <string name="tutorial2">Dismiss the service using the \'x\' button.</string>
+    <string name="pleaseEnableOverlay">Please allow drawing on top of other apps, so that the service can start saving battery right away.</string>
+    <string name="tutorial1">The service has started.\nTo advance, tap here or on any black area.</string>
+    <string name="tutorial2">As you\'ve noticed, any tap outside the viewport will move it there.\nGive it a try.</string>
+    <string name="tutorial3">You can interact with your original content trough the viewport, as usual.</string>
+    <string name="tutorial4">Pressing the \'x\' button will stop the service.\nTap on any black area to continue.</string>
+    <string name="tutorial5">Thanks for reading the tutorial.\nEnjoy the app and please send any suggestions of improvement using the GPlay review system :)</string>
     <string name="starter_restart_tutorial">Restart tutorial</string>
     <string name="starter_position_text">On screen starting position:</string>
     <string name="starter_height_text">Viewport height (% of screen):</string>
     <string name="service_status">Status:</string>
-    <string name="welcome">Welcome to the service that helps you save battery and gain more privacy</string>
+    <string name="welcome">Welcome to the service that helps you save battery and gain more privacy when reading content on your device</string>
+    <string name="starter_quick">Next time you tap-the-app™, instead of opening this screen, quickly start the service</string>
 </resources>

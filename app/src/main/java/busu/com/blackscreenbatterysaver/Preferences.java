@@ -13,6 +13,7 @@ public class Preferences {
     private final static String KEY_HEIGHT = "kh";
     private final static String KEY_POS = "kp";
     private final static String KEY_TUTORIAL = "ktut";
+    private final static String KEY_QUICK = "kqk";
 
     private SharedPreferences mPrefs;
 
@@ -50,5 +51,29 @@ public class Preferences {
 
     public void setHasToShowTutorial(boolean hasToShowTutorial) {
         mPrefs.edit().putBoolean(KEY_TUTORIAL, hasToShowTutorial).apply();
+    }
+
+    public final static boolean DEFAULT_QUICK_START = true;
+
+    /**
+     * Because first time the app starts we want to show the activity,
+     * but at the same time to let the default value be persisted and applied to the checkbox,
+     * hacka bit by returning the negated default, while persisting the default, so that next read
+     * will return the correct value.
+     *
+     * @return
+     */
+    public boolean hasToQuickStart() {
+        if (mPrefs.contains(KEY_QUICK)) {
+            return mPrefs.getBoolean(KEY_QUICK, DEFAULT_QUICK_START);
+        } else {
+            //first time starting the app
+            setQuickStart(DEFAULT_QUICK_START);
+            return !DEFAULT_QUICK_START;
+        }
+    }
+
+    public void setQuickStart(boolean hasToQuicklyStart) {
+        mPrefs.edit().putBoolean(KEY_QUICK, hasToQuicklyStart).apply();
     }
 }

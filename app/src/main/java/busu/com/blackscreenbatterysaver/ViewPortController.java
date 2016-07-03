@@ -352,10 +352,11 @@ public class ViewPortController {
                 mTutorialBox.setGravity(Gravity.CENTER);
                 mTutorialBox.setSingleLine(false);
                 mTutorialBox.setClickable(false);
-                mTutorialBox.setTextSize(20);
+                mTutorialBox.setTextSize(22);
                 //
                 FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 lp.gravity = Gravity.CENTER;
+                lp.setMargins(10, 10, 10, 10);
                 mView.addView(mTutorialBox, lp);
             }
             mTutorialBox.setText(tutorialText);

@@ -31,7 +31,7 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
     private ViewPortController mVpCtrl;
 
     private int mTutorialStep = 0;
-    private static final int[] TUTORIAL_STEPS = {R.string.tutorial1, R.string.tutorial2};
+    private static final int[] TUTORIAL_STEPS = {R.string.tutorial1, R.string.tutorial2, R.string.tutorial3, R.string.tutorial4, R.string.tutorial5};
 
 
     @Override
@@ -120,6 +120,8 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
                     mVpCtrl.applyHoleHeigthPercentage(mPrefs.getHoleHeightPercentage());
                     mVpCtrl.applyHoleVerticalGravity(mPrefs.getHoleGravity());
                 } else if (action.equals(ACTION_TUTORIAL)) {
+                    mTutorialStep = 0;
+                    mPrefs.setHasToShowTutorial(true);
                     loadTutorial();
                 }
                 sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
@@ -173,7 +175,6 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
 
     private void loadTutorial() {
         if (mPrefs.hasToShowTutorial()) {
-            mTutorialStep = 0;
             mVpCtrl.showTutorial(TUTORIAL_STEPS[mTutorialStep]);
         }
     }

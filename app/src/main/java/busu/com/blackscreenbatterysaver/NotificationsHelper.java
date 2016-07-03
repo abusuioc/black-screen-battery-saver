@@ -53,6 +53,7 @@ public class NotificationsHelper {
 
     private PendingIntent buildShowSettingsPendingIntent() {
         Intent intent = new Intent(mService, StarterActivity.class);
+        intent.setAction(StarterActivity.ACTION_PREVENT_QUICKSTART);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(mService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }

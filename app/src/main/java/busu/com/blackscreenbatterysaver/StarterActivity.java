@@ -16,6 +16,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -28,11 +30,14 @@ public class StarterActivity extends AppCompatActivity {
 
     public final static String TAG = "BSBS";
 
+    public final static String ACTION_PREVENT_QUICKSTART = "com.busu.blackscreenbatterysaver.ACTION_PREVENT_QUICK";
+
     private Preferences mPrefs;
 
     private Button mBtnStartStop, mBtnTutorial;
     private RadioGroup mRgPos, mRgPer;
     private TextView mStatus;
+    private CheckBox mChkQuick;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -66,6 +71,11 @@ public class StarterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPrefs = new Preferences(this);
+        if(hasToCancelActivityAndStartService()) {
+            startTheService();
+            return;
+        }
+
         initMapIds();
 
         setContentView(R.layout.starter);
@@ -87,7 +97,6 @@ public class StarterActivity extends AppCompatActivity {
         mBtnTutorial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPrefs.setHasToShowTutorial(true);
                 startTheService(TheService.ACTION_TUTORIAL, true);
             }
         });
@@ -102,12 +111,48 @@ public class StarterActivity extends AppCompatActivity {
 
         mStatus = (TextView) findViewById(R.id.sStatus);
 
+        mChkQuick = (CheckBox) findViewById(R.id.sChkQuickly);
+        mChkQuick.setChecked(mPrefs.hasToQuickStart());
+        mChkQuick.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mPrefs.setQuickStart(isChecked);
+            }
+        });
+
         serviceStatusChanged(TheService.state, null);
+    }
+
+    private boolean hasToCancelActivityAndStartService() {
+        if (TheService.state == TheService.State.ACTIVE) {
+            //start activity if service is already running: users want to configure smth
+            return false;
+        }
+
+        Intent startIntent = getIntent();
+        if (startIntent == null) {
+            //this should never happen
+            startIntent = new Intent(this, StarterActivity.class);
+            startIntent.setAction(ACTION_PREVENT_QUICKSTART);
+        }
+        //extract action from intent so that the intent can be updated
+        String startAction = startIntent.getAction();
+
+        //once the activity started, prevent not starting after rotation
+        startIntent.setAction(ACTION_PREVENT_QUICKSTART);
+        setIntent(startIntent);
+
+        boolean isQuick = mPrefs.hasToQuickStart();
+        if (isQuick && !ACTION_PREVENT_QUICKSTART.equals(startAction)) {
+            return true;
+        }
+        return false;
     }
 
     /**
      * Currently save all configurable options and load them in the service for every option available; TODO separate for each
      */
+
     private void savePrefsAndAskServiceToApplyThem() {
         savePrefsFromComponents();
         if (TheService.state != TheService.State.STOPPED) {

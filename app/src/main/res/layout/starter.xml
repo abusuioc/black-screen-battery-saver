@@ -10,6 +10,7 @@
         android:layout_gravity="center"
         android:orientation="vertical">
 
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,12 +22,12 @@
             android:textSize="20sp" />
 
         <TextView
-            android:layout_marginTop="10dp"
             android:id="@+id/sStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:textSize="22sp"
             tools:text="started/stopped"
             tools:textColor="@android:color/holo_green_dark" />
@@ -103,6 +104,16 @@
                 android:text="BOTTOM"
                 android:textSize="18sp" />
         </RadioGroup>
+
+        <CheckBox
+            android:id="@+id/sChkQuickly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/starter_quick" />
 
         <Button
             android:id="@+id/sBtnTutorial"
