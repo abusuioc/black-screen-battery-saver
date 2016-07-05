@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="40dp"
     android:orientation="horizontal">
 
     <Button
         android:id="@+id/notifSize1p2"
         android:layout_width="70dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:text="1/2" />
 
     <Button
         android:id="@+id/notifSize1p3"
         android:layout_width="70dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:text="1/3" />
 
     <Button
         android:id="@+id/notifStop"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:text="stop" />
 
     <ImageButton
         android:id="@+id/notifSettings"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:src="@android:drawable/ic_menu_preferences" />
 
     <Button
         android:id="@+id/notifTutorial"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:text="\?" />
 
 </LinearLayout>
