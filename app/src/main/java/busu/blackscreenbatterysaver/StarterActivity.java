@@ -71,7 +71,7 @@ public class StarterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPrefs = new Preferences(this);
-        if(hasToCancelActivityAndStartService()) {
+        if (hasToCancelActivityAndStartService(savedInstanceState != null)) {
             startTheService();
             return;
         }
@@ -123,8 +123,11 @@ public class StarterActivity extends AppCompatActivity {
         serviceStatusChanged(TheService.state, null);
     }
 
-    private boolean hasToCancelActivityAndStartService() {
-        if (TheService.state == TheService.State.ACTIVE) {
+    private boolean hasToCancelActivityAndStartService(boolean isAfterConfigChange) {
+        //call this so that it does the hack of getting first time ever starting the app a false and setting it to true for next uses
+        boolean isQuick = mPrefs.hasToQuickStart();
+
+        if (TheService.state == TheService.State.ACTIVE || !canDrawOverlay()) {
             //start activity if service is already running: users want to configure smth
             return false;
         }
@@ -142,8 +145,7 @@ public class StarterActivity extends AppCompatActivity {
         startIntent.setAction(ACTION_PREVENT_QUICKSTART);
         setIntent(startIntent);
 
-        boolean isQuick = mPrefs.hasToQuickStart();
-        if (isQuick && !ACTION_PREVENT_QUICKSTART.equals(startAction)) {
+        if (isQuick && !ACTION_PREVENT_QUICKSTART.equals(startAction) && !isAfterConfigChange) {
             return true;
         }
         return false;
@@ -182,7 +184,7 @@ public class StarterActivity extends AppCompatActivity {
     public final static int REQUEST_CODE = 1;
 
     public void checkDrawOverlayPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(StarterActivity.this)) {
+        if (!canDrawOverlay()) {
             new AlertDialog.Builder(this).setCancelable(true).
                     setMessage(R.string.overlay_enabling_dialog).
                     setPositiveButton(R.string.overlay_proceed, new DialogInterface.OnClickListener() {
@@ -201,10 +203,15 @@ public class StarterActivity extends AppCompatActivity {
         }
     }
 
+
+    private boolean canDrawOverlay() {
+        return !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(StarterActivity.this));
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(StarterActivity.this)) {
+            if (canDrawOverlay()) {
                 startTheService();
             } else {
                 Snackbar.make(mBtnStartStop, R.string.pleaseEnableOverlay, Snackbar.LENGTH_LONG).show();
