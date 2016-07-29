@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.NotificationCompat;
+import android.view.View;
 import android.widget.RemoteViews;
 
 /**
@@ -23,7 +24,7 @@ public class NotificationsHelper {
         mNotificationsManager = (NotificationManager) mService.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
-    private NotificationCompat.Builder createBuilder() {
+    private NotificationCompat.Builder createBuilder(ChangeNotificationBody changer) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mService);
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         builder.setSmallIcon(R.mipmap.ic_launcher);
@@ -42,6 +43,10 @@ public class NotificationsHelper {
         body.setOnClickPendingIntent(R.id.notifTutorial, intentTutorial);
         builder.setAutoCancel(false);
         builder.setOngoing(true);
+
+        if (changer != null) {
+            changer.alterBody(body);
+        }
         return builder;
     }
 
@@ -65,17 +70,40 @@ public class NotificationsHelper {
         return notificationView;
     }
 
-    public NotificationCompat.Builder buildServiceStarted() {
-        NotificationCompat.Builder builder = createBuilder();
-        builder.setTicker(mService.getResources().getString(R.string.service_started));
-        return builder;
+    private void fireNotification(NotificationCompat.Builder builder) {
+        mNotificationsManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    public void fireNotification(NotificationCompat.Builder builder) {
-        mNotificationsManager.notify(NOTIFICATION_ID, builder.build());
+    public void startOrUpdateNotification(ChangeNotificationBody changer) {
+        NotificationCompat.Builder builder = createBuilder(changer);
+        fireNotification(builder);
+    }
+
+
+    public interface ChangeNotificationBody {
+        void alterBody(RemoteViews body);
     }
 
     public void cancelNotification() {
         mNotificationsManager.cancel(NOTIFICATION_ID);
+    }
+
+    public static class ChangeVisibilityOfHeight implements ChangeNotificationBody {
+        private boolean mIsHalf;
+
+        ChangeVisibilityOfHeight(boolean isHeightHalfCurrently) {
+            mIsHalf = isHeightHalfCurrently;
+        }
+
+        @Override
+        public void alterBody(RemoteViews body) {
+            if (mIsHalf) {
+                body.setViewVisibility(R.id.notifSize1p2, View.GONE);
+                body.setViewVisibility(R.id.notifSize1p3, View.VISIBLE);
+            } else {
+                body.setViewVisibility(R.id.notifSize1p2, View.VISIBLE);
+                body.setViewVisibility(R.id.notifSize1p3, View.GONE);
+            }
+        }
     }
 }
