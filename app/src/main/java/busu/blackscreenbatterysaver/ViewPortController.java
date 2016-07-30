@@ -165,7 +165,7 @@ public class ViewPortController {
     public void showTutorial(@StringRes int tutorialText) {
         if (mTutorialFont == null) {
             mTutorialFont = Typeface.createFromAsset(mContext.getAssets(),
-                    "fonts/handwrite.ttf");
+                    "fonts/nunito_light.ttf");
         }
         mTutorialText = tutorialText;
         positionTutorial();
