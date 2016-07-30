@@ -27,7 +27,7 @@ public class NotificationsHelper {
     private NotificationCompat.Builder createBuilder(ChangeNotificationBody changer) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mService);
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
-        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setSmallIcon(getNotificationIcon());
         RemoteViews body = getComplexNotificationView();
         builder.setContent(body);
 
@@ -48,6 +48,11 @@ public class NotificationsHelper {
             changer.alterBody(body);
         }
         return builder;
+    }
+
+    private int getNotificationIcon() {
+        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
+        return useWhiteIcon ? R.drawable.notif_icon : R.mipmap.ic_launcher;
     }
 
     private PendingIntent buildPendingIntentFor(String action) {
