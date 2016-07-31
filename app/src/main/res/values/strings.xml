@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BlackScreenBatterySaver</string>
+    <string name="app_name">BlackScot</string>
 
     <string name="btn_start">Start</string>
     <string name="btn_stop">Stop</string>
@@ -23,4 +23,6 @@
     <string name="service_status">Status:</string>
     <string name="welcome">Welcome to the service that helps you save battery and gain more privacy when reading content on your device</string>
     <string name="starter_quick">Next time you tap-the-app™, instead of opening this screen, quickly start the service</string>
+
+    <string name="starter_rate">Like? Then like also on Google Play!</string>
 </resources>

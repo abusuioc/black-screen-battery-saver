@@ -1,11 +1,15 @@
 package busu.blackscreenbatterysaver;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ResolveInfo;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +25,10 @@ import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by adibusu on 5/14/16.
@@ -117,6 +124,15 @@ public class StarterActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mPrefs.setQuickStart(isChecked);
+            }
+        });
+
+        final TextView rate = (TextView) findViewById(R.id.sTxtRate);
+        rate.setPaintFlags(rate.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
+        rate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAppRating(StarterActivity.this);
             }
         });
 
@@ -248,7 +264,7 @@ public class StarterActivity extends AppCompatActivity {
         if (isStarted) {
             mBtnTutorial.setVisibility(View.VISIBLE);
         } else {
-            mBtnTutorial.setVisibility(View.INVISIBLE);
+            mBtnTutorial.setVisibility(View.GONE);
         }
     }
 
@@ -268,6 +284,37 @@ public class StarterActivity extends AppCompatActivity {
         mMapGravity.put(Gravity.CENTER, R.id.sRbPosCenter);
         mMapGravity.put(R.id.sRbPosTop, Gravity.TOP);
         mMapGravity.put(Gravity.TOP, R.id.sRbPosTop);
+    }
+
+    public static void openAppRating(Context context) {
+        Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.getPackageName()));
+        boolean marketFound = false;
+
+        // find all applications able to handle our rateIntent
+        final List<ResolveInfo> otherApps = context.getPackageManager().queryIntentActivities(rateIntent, 0);
+        for (ResolveInfo otherApp: otherApps) {
+            // look for Google Play application
+            if (otherApp.activityInfo.applicationInfo.packageName.equals("com.android.vending")) {
+
+                ActivityInfo otherAppActivity = otherApp.activityInfo;
+                ComponentName componentName = new ComponentName(
+                        otherAppActivity.applicationInfo.packageName,
+                        otherAppActivity.name
+                );
+                rateIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                rateIntent.setComponent(componentName);
+                context.startActivity(rateIntent);
+                marketFound = true;
+                break;
+
+            }
+        }
+
+        // if GP not present on device, open web browser
+        if (!marketFound) {
+            Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id="+context.getPackageName()));
+            context.startActivity(webIntent);
+        }
     }
 
 
