@@ -75,6 +75,8 @@ public class StarterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
         mPrefs = new Preferences(this);
         if (hasToCancelActivityAndStartService(savedInstanceState != null)) {
             startTheService();
@@ -315,5 +317,9 @@ public class StarterActivity extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
 }
