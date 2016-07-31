@@ -2,6 +2,7 @@
 <resources>
     <color name="colorPrimary">#addccf</color>
     <color name="colorPrimaryDark">#5ca091</color>
-    <color name="colorAccent">#000</color>
-    <color name="colorBackground">#EAEAEA</color>
+    <color name="colorAccent">#eee</color>
+
+    <color name="starter_background">#000</color>
 </resources>

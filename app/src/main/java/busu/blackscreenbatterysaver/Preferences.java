@@ -58,7 +58,7 @@ public class Preferences {
     /**
      * Because first time the app starts we want to show the activity,
      * but at the same time to let the default value be persisted and applied to the checkbox,
-     * hacka bit by returning the negated default, while persisting the default, so that next read
+     * hack a bit by returning the negated default, while persisting the default, so that next read
      * will return the correct value.
      *
      * @return
