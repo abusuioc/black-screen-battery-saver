@@ -63,6 +63,13 @@
             android:layout_height="wrap_content"
             android:text="one third (33%)"
             android:textSize="18sp" />
+
+        <RadioButton
+            android:id="@+id/sRbPerFull"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 (full black)"
+            android:textSize="18sp" />
     </RadioGroup>
 
     <TextView

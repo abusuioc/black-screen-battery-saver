@@ -23,6 +23,7 @@ public class Preferences {
 
     public static final int HOLE_HEIGHT_PERCENTAGE_1P3 = 33;
     public static final int HOLE_HEIGHT_PERCENTAGE_1P2 = 50;
+    public static final int HOLE_HEIGHT_PERCENTAGE_FULL = 0;
     public static final int DEFAULT_HOLE_HEIGHT_PERCENTAGE = HOLE_HEIGHT_PERCENTAGE_1P2;
 
     public int getHoleHeightPercentage() {

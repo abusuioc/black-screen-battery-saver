@@ -93,22 +93,15 @@ public class NotificationsHelper {
         mNotificationsManager.cancel(NOTIFICATION_ID);
     }
 
-    public static class ChangeVisibilityOfHeight implements ChangeNotificationBody {
-        private boolean mIsHalf;
+    public static class ChangeHeightSelection implements ChangeNotificationBody {
+        private int mCurrentHeight;
 
-        ChangeVisibilityOfHeight(boolean isHeightHalfCurrently) {
-            mIsHalf = isHeightHalfCurrently;
+        ChangeHeightSelection(int currentHeight) {
+            mCurrentHeight = currentHeight;
         }
 
         @Override
         public void alterBody(RemoteViews body) {
-            if (mIsHalf) {
-                body.setViewVisibility(R.id.notifSize1p2, View.GONE);
-                body.setViewVisibility(R.id.notifSize1p3, View.VISIBLE);
-            } else {
-                body.setViewVisibility(R.id.notifSize1p2, View.VISIBLE);
-                body.setViewVisibility(R.id.notifSize1p3, View.GONE);
-            }
         }
     }
 }

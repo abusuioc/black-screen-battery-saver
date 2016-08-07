@@ -275,8 +275,10 @@ public class StarterActivity extends AppCompatActivity {
         mMapHeight = new HashMap<>();
         mMapHeight.put(R.id.sRbPerHalf, Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
         mMapHeight.put(R.id.sRbPerThird, Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
+        mMapHeight.put(R.id.sRbPerFull, Preferences.HOLE_HEIGHT_PERCENTAGE_FULL);
         mMapHeight.put(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3, R.id.sRbPerThird);
         mMapHeight.put(Preferences.HOLE_HEIGHT_PERCENTAGE_1P2, R.id.sRbPerHalf);
+        mMapHeight.put(Preferences.HOLE_HEIGHT_PERCENTAGE_FULL, R.id.sRbPerFull);
         mMapGravity = new HashMap<>();
         mMapGravity.put(R.id.sRbPosBottom, Gravity.BOTTOM);
         mMapGravity.put(Gravity.BOTTOM, R.id.sRbPosBottom);

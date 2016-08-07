@@ -13,6 +13,7 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
 
     public final static String ACTION_SIZE_1P2 = "1p2";
     public final static String ACTION_SIZE_1P3 = "1p3";
+    public final static String ACTION_SIZE_FULL = "1full";
     public final static String ACTION_STOP = "stop";
     public final static String ACTION_START = "start";
     public final static String ACTION_READPREFS = "read_prefs";
@@ -75,7 +76,7 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
                 break;
             case ACTIVE:
                 addViewPort();
-                mNotifs.startOrUpdateNotification(new NotificationsHelper.ChangeVisibilityOfHeight(mPrefs.getHoleHeightPercentage() == Preferences.HOLE_HEIGHT_PERCENTAGE_1P2));
+                mNotifs.startOrUpdateNotification(new NotificationsHelper.ChangeHeightSelection(mPrefs.getHoleHeightPercentage()));
                 break;
             case STOPPED:
                 if (oldState == State.ACTIVE) {
@@ -102,16 +103,8 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
             final String action = intent.getAction();
             LogUtil.logService("Action received: " + action + " in state: " + state);
             if (action != null) {
-                if (action.equals(ACTION_SIZE_1P2)) {
-                    mPrefs.setHoleHeightPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
-                    mVpCtrl.applyHoleHeigthPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
-                    mNotifs.startOrUpdateNotification(new NotificationsHelper.ChangeVisibilityOfHeight(true));
-                    sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
-                } else if (action.equals(ACTION_SIZE_1P3)) {
-                    mPrefs.setHoleHeightPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
-                    mVpCtrl.applyHoleHeigthPercentage(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
-                    mNotifs.startOrUpdateNotification(new NotificationsHelper.ChangeVisibilityOfHeight(false));
-                    sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
+                if (commandChangeSize(action)) {
+                    // ^ takes care of it
                 } else if (action.equals(ACTION_STOP)) {
 //                    changeServiceState(State.STANDBY);
                     // ^ ok in the scenario in which we allow service to live forever
@@ -133,6 +126,27 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
         return START_STICKY;
     }
 
+    private boolean commandChangeSize(String action) {
+        int vpHeightPer = Integer.MAX_VALUE;
+        if (action.equals(ACTION_SIZE_1P2)) {
+            vpHeightPer = Preferences.HOLE_HEIGHT_PERCENTAGE_1P2;
+        } else if (action.equals(ACTION_SIZE_1P3)) {
+            vpHeightPer = Preferences.HOLE_HEIGHT_PERCENTAGE_1P3;
+        } else if (action.equals(ACTION_SIZE_FULL)) {
+            vpHeightPer = Preferences.HOLE_HEIGHT_PERCENTAGE_FULL;
+        }
+        //
+        if (vpHeightPer == Integer.MAX_VALUE) {
+            return false;
+        } else {
+            mPrefs.setHoleHeightPercentage(vpHeightPer);
+            mVpCtrl.applyHoleHeigthPercentage(vpHeightPer);
+            mNotifs.startOrUpdateNotification(new NotificationsHelper.ChangeHeightSelection(vpHeightPer));
+            sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
+            return true;
+        }
+    }
+
     private void addViewPort() {
         mVpCtrl.applyHoleHeigthPercentage(mPrefs.getHoleHeightPercentage());
         mVpCtrl.applyHoleVerticalGravity(mPrefs.getHoleGravity());
@@ -146,14 +160,21 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
 
     @Override
     public void onBlackClicked(ViewPortController.ViewLayout black, float clickVerticalRatio) {
-        boolean isCenterRequested = (clickVerticalRatio <= 0.5f && black.gravity == Gravity.BOTTOM)
-                || (clickVerticalRatio > 0.5f && black.gravity == Gravity.TOP);
-        mVpCtrl.changeHoleGravity(isCenterRequested, black.gravity);
-        mPrefs.setHoleGravity(mVpCtrl.getHoleGravity());
-        sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
-        incrementTutorial(true);
-        LogUtil.logService("Click on: " + black.toString() + ", center req: " + isCenterRequested + ", hole gravity: "
-                + ViewPortController.getGravityString(mVpCtrl.getHoleGravity()));
+        //if black is full screen, the click will quickly restore a 1/2 viewport
+        if (mPrefs.getHoleHeightPercentage() == Preferences.HOLE_HEIGHT_PERCENTAGE_FULL) {
+            commandChangeSize(ACTION_SIZE_1P2);
+            incrementTutorial(true);
+            LogUtil.logService("Click on: " + black.toString() + " while full screen black");
+        } else {
+            boolean isCenterRequested = (clickVerticalRatio <= 0.5f && black.gravity == Gravity.BOTTOM)
+                    || (clickVerticalRatio > 0.5f && black.gravity == Gravity.TOP);
+            mVpCtrl.changeHoleGravity(isCenterRequested, black.gravity);
+            mPrefs.setHoleGravity(mVpCtrl.getHoleGravity());
+            sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
+            incrementTutorial(true);
+            LogUtil.logService("Click on: " + black.toString() + ", center req: " + isCenterRequested + ", hole gravity: "
+                    + ViewPortController.getGravityString(mVpCtrl.getHoleGravity()));
+        }
     }
 
     @Override
