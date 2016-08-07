@@ -103,8 +103,10 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
             final String action = intent.getAction();
             LogUtil.logService("Action received: " + action + " in state: " + state);
             if (action != null) {
+                boolean hasToCloseSystemBar = true;
                 if (commandChangeSize(action)) {
                     // ^ takes care of it
+                    hasToCloseSystemBar = false;
                 } else if (action.equals(ACTION_STOP)) {
 //                    changeServiceState(State.STANDBY);
                     // ^ ok in the scenario in which we allow service to live forever
@@ -119,7 +121,9 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
                     mPrefs.setHasToShowTutorial(true);
                     loadTutorial();
                 }
-                sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+                if (hasToCloseSystemBar) {
+                    sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+                }
             }
         }
 

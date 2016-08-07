@@ -6,7 +6,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.NotificationCompat;
-import android.view.View;
 import android.widget.RemoteViews;
 
 /**
@@ -33,11 +32,13 @@ public class NotificationsHelper {
 
         PendingIntent intent1p2 = buildPendingIntentFor(TheService.ACTION_SIZE_1P2);
         PendingIntent intent1p3 = buildPendingIntentFor(TheService.ACTION_SIZE_1P3);
+        PendingIntent intentFull = buildPendingIntentFor(TheService.ACTION_SIZE_FULL);
         PendingIntent intentStop = buildPendingIntentFor(TheService.ACTION_STOP);
         PendingIntent intentTutorial = buildPendingIntentFor(TheService.ACTION_TUTORIAL);
 
         body.setOnClickPendingIntent(R.id.notifSize1p2, intent1p2);
         body.setOnClickPendingIntent(R.id.notifSize1p3, intent1p3);
+        body.setOnClickPendingIntent(R.id.notifSizeFull, intentFull);
         body.setOnClickPendingIntent(R.id.notifStop, intentStop);
         body.setOnClickPendingIntent(R.id.notifSettings, buildShowSettingsPendingIntent());
         body.setOnClickPendingIntent(R.id.notifTutorial, intentTutorial);
@@ -96,12 +97,26 @@ public class NotificationsHelper {
     public static class ChangeHeightSelection implements ChangeNotificationBody {
         private int mCurrentHeight;
 
+        final int COUNT_HEIGHT_VIEWS = 3;
+
+        final int[] heightViews = new int[]{R.id.notifSize1p2, R.id.notifSize1p3, R.id.notifSizeFull};
+        final int[] heightDrawables = new int[]{R.drawable.bkg_1p2, R.drawable.bkg_1p3, R.drawable.bkg_full};
+        final int[] heightDrawablesSel = new int[]{R.drawable.bkg_1p2_sel, R.drawable.bkg_1p3_sel, R.drawable.bkg_full_sel};
+        final int[] heights = new int[]{Preferences.HOLE_HEIGHT_PERCENTAGE_1P2, Preferences.HOLE_HEIGHT_PERCENTAGE_1P3, Preferences.HOLE_HEIGHT_PERCENTAGE_FULL};
+
         ChangeHeightSelection(int currentHeight) {
             mCurrentHeight = currentHeight;
         }
 
         @Override
         public void alterBody(RemoteViews body) {
+            for (int i = 0; i < COUNT_HEIGHT_VIEWS; i++) {
+                if (mCurrentHeight == heights[i]) {
+                    body.setInt(heightViews[i], "setBackgroundResource", heightDrawablesSel[i]);
+                } else {
+                    body.setInt(heightViews[i], "setBackgroundResource", heightDrawables[i]);
+                }
+            }
         }
     }
 }

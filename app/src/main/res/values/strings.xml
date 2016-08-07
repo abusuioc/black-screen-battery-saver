@@ -13,7 +13,7 @@
     <string name="overlay_cancel">Cancel</string>
     <string name="pleaseEnableOverlay">Please allow drawing on top of other apps, so that the service can start saving battery right away.</string>
     <string name="tutorial1">The service is now started.\nTo continue the tutorial, tap here or on any black area.</string>
-    <string name="tutorial2">As you\'ve noticed, any tap outside the viewport will move it there.\nGive it a try.</string>
+    <string name="tutorial2">As you\'ve noticed, any tap on black will move the viewport there.\nGive it a try.</string>
     <string name="tutorial3">You can interact with your original content through the viewport, as usual.</string>
     <string name="tutorial4">Pressing the \'x\' button will quickly stop the service.\nTap on any black area to continue.</string>
     <string name="tutorial5">Enjoy this service and please send any suggestions of improvement using the GPlay review system :)</string>

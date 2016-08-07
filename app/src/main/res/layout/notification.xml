@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimary"
-    android:orientation="horizontal">
+    android:background="@color/colorPrimary">
 
     <Button
         android:id="@+id/notifSize1p2"
@@ -12,7 +11,7 @@
         android:layout_margin="@dimen/notif_item_margin"
         android:background="@drawable/bkg_1p2"
         android:text="1/2"
-        android:textColor="@android:color/white" />
+        android:textColor="@color/notifs_height_sel_txt" />
 
     <Button
         android:id="@+id/notifSize1p3"
@@ -21,7 +20,15 @@
         android:layout_margin="@dimen/notif_item_margin"
         android:background="@drawable/bkg_1p3"
         android:text="1/3"
-        android:textColor="@android:color/white" />
+        android:textColor="@color/notifs_height_sel_txt" />
+    <Button
+        android:id="@+id/notifSizeFull"
+        android:layout_width="@dimen/notif_item_height"
+        android:layout_height="@dimen/notif_item_height"
+        android:layout_margin="@dimen/notif_item_margin"
+        android:background="@drawable/bkg_full"
+        android:text="0"
+        android:textColor="@color/notifs_height_sel_txt" />
 
     <Button
         android:id="@+id/notifStop"

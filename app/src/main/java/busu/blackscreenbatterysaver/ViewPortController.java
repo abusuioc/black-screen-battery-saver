@@ -317,12 +317,8 @@ public class ViewPortController {
         public void applyHeightRatio(float ratio) {
             mHeightRatio = ratio;
             if (mTotalHeight > 0) {
-                //after we know
-                mLayoutParams.height = (int) (mTotalHeight * mHeightRatio);
-                if (mLayoutParams.height == 0) {
-                    //not repainting for width = 0; TODO switch to position based resizing effect (constant height, adjust y)
-                    mLayoutParams.height = 1;
-                }
+                //after we know, round to the higher value
+                mLayoutParams.height =  (int) (mTotalHeight * mHeightRatio) + 1;
                 changeOfLayoutParamsRequested(this);
             } else {
                 //just set the height ratio

@@ -4,7 +4,7 @@
         android:width="@dimen/notif_item_height"
         android:height="@dimen/notif_item_height">
         <shape android:shape="rectangle">
-            <solid android:color="@color/notifs_height_def_black" />
+            <solid android:color="@color/notifs_height_sel_black" />
             <corners android:radius="5dp" />
         </shape>
     </item>
@@ -12,7 +12,7 @@
         android:height="16dp"
         android:gravity="center_vertical">
         <shape android:shape="rectangle">
-            <solid android:color="@color/notifs_height_def_green" />
+            <solid android:color="@color/notifs_height_sel_green" />
         </shape>
     </item>
 </layer-list>
