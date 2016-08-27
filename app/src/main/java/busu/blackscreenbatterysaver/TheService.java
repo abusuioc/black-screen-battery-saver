@@ -71,17 +71,20 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
             case STANDBY:
                 if (oldState == State.ACTIVE) {
                     removeViewPort();
-                    mNotifs.cancelNotification();
+                    mNotifs.cancelMainNotification();
+                    mNotifs.startStandbyNotification();
                 }
                 break;
             case ACTIVE:
                 addViewPort();
-                mNotifs.startOrUpdateNotification(new NotificationsHelper.ChangeHeightSelection(mPrefs.getHoleHeightPercentage()));
+                mNotifs.cancelStandbyNotification();
+                mNotifs.startOrUpdateMainNotification(new NotificationsHelper.ChangeHeightSelection(mPrefs.getHoleHeightPercentage()));
                 break;
             case STOPPED:
                 if (oldState == State.ACTIVE) {
                     removeViewPort();
-                    mNotifs.cancelNotification();
+                    mNotifs.cancelMainNotification();
+                    mNotifs.startStandbyNotification();
                 }
                 stopSelf();
                 break;
@@ -145,7 +148,7 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
         } else {
             mPrefs.setHoleHeightPercentage(vpHeightPer);
             mVpCtrl.applyHoleHeigthPercentage(vpHeightPer);
-            mNotifs.startOrUpdateNotification(new NotificationsHelper.ChangeHeightSelection(vpHeightPer));
+            mNotifs.startOrUpdateMainNotification(new NotificationsHelper.ChangeHeightSelection(vpHeightPer));
             sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
             return true;
         }

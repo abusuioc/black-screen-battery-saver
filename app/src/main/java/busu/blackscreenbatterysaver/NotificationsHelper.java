@@ -2,7 +2,6 @@ package busu.blackscreenbatterysaver;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.NotificationCompat;
@@ -13,18 +12,19 @@ import android.widget.RemoteViews;
  */
 public class NotificationsHelper {
 
-    private final static int NOTIFICATION_ID = 998822;
+    private final static int ID_MAIN = 998822;
+    private final static int ID_STANDBY = 62344;
 
-    private Service mService;
+    private Context mContext;
     private NotificationManager mNotificationsManager;
 
-    public NotificationsHelper(Service theService) {
-        mService = theService;
-        mNotificationsManager = (NotificationManager) mService.getSystemService(Context.NOTIFICATION_SERVICE);
+    public NotificationsHelper(Context theService) {
+        mContext = theService;
+        mNotificationsManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
-    private NotificationCompat.Builder createBuilder(ChangeNotificationBody changer) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mService);
+    private NotificationCompat.Builder createMainBuilder(ChangeNotificationBody changer) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         builder.setSmallIcon(getNotificationIcon());
         RemoteViews body = getComplexNotificationView();
@@ -57,32 +57,38 @@ public class NotificationsHelper {
     }
 
     private PendingIntent buildPendingIntentFor(String action) {
-        Intent intent = new Intent(action, null, mService, TheService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(mService, 0, intent, 0);
+        Intent intent = new Intent(action, null, mContext, TheService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(mContext, 0, intent, 0);
         return pendingIntent;
     }
 
     private PendingIntent buildShowSettingsPendingIntent() {
-        Intent intent = new Intent(mService, StarterActivity.class);
+        Intent intent = new Intent(mContext, StarterActivity.class);
         intent.setAction(StarterActivity.ACTION_PREVENT_QUICKSTART);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        return PendingIntent.getActivity(mService, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private PendingIntent buildStartServicePendingIntent() {
+        Intent intent = new Intent(mContext, TheService.class);
+        intent.setAction(TheService.ACTION_START);
+        return PendingIntent.getService(mContext, 0, intent, 0);
     }
 
     private RemoteViews getComplexNotificationView() {
         RemoteViews notificationView = new RemoteViews(
-                mService.getPackageName(),
+                mContext.getPackageName(),
                 R.layout.notification);
         return notificationView;
     }
 
-    private void fireNotification(NotificationCompat.Builder builder) {
-        mNotificationsManager.notify(NOTIFICATION_ID, builder.build());
+    private void fireNotification(int id, NotificationCompat.Builder builder) {
+        mNotificationsManager.notify(id, builder.build());
     }
 
-    public void startOrUpdateNotification(ChangeNotificationBody changer) {
-        NotificationCompat.Builder builder = createBuilder(changer);
-        fireNotification(builder);
+    public void startOrUpdateMainNotification(ChangeNotificationBody changer) {
+        final NotificationCompat.Builder builder = createMainBuilder(changer);
+        fireNotification(ID_MAIN, builder);
     }
 
 
@@ -90,8 +96,12 @@ public class NotificationsHelper {
         void alterBody(RemoteViews body);
     }
 
-    public void cancelNotification() {
-        mNotificationsManager.cancel(NOTIFICATION_ID);
+    private void cancelNotification(int id) {
+        mNotificationsManager.cancel(id);
+    }
+
+    public void cancelMainNotification() {
+        cancelNotification(ID_MAIN);
     }
 
     public static class ChangeHeightSelection implements ChangeNotificationBody {
@@ -119,4 +129,38 @@ public class NotificationsHelper {
             }
         }
     }
+
+
+    //
+    private NotificationCompat.Builder createStandbyBuilder() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+        builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+        builder.setSmallIcon(getNotificationIcon());
+        builder.setContentTitle(mContext.getString(R.string.not_starter_text));
+        builder.setContentText(mContext.getString(R.string.not_starter_text_sec));
+        builder.setContentIntent(buildStartServicePendingIntent());
+        builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, mContext.getString(R.string.not_starter_dismiss), buildCancelStandbyNotifsIntent());
+        builder.setOngoing(true);
+        return builder;
+    }
+
+    public void startStandbyNotification() {
+        final NotificationCompat.Builder builder = createStandbyBuilder();
+        fireNotification(ID_STANDBY, builder);
+    }
+
+    public void cancelStandbyNotification() {
+        cancelNotification(ID_STANDBY);
+    }
+
+    public static void cancelStandbyNotification(Context context) {
+        final NotificationsHelper notifsHelp = new NotificationsHelper(context);
+        notifsHelp.cancelStandbyNotification();
+    }
+
+    private PendingIntent buildCancelStandbyNotifsIntent() {
+        final Intent cancel = new Intent("busu.blackscreenbatterysaver.cancel_standby");
+        return PendingIntent.getBroadcast(mContext, 0, cancel, PendingIntent.FLAG_CANCEL_CURRENT);
+    }
+
 }

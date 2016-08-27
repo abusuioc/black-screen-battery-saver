@@ -10,6 +10,9 @@ import android.content.Intent;
 public class BootCompletedReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        context.startService(new Intent(context, TheService.class));
+        if (StarterActivity.canDrawOverlay(context)) {
+            final NotificationsHelper notifsHelper = new NotificationsHelper(context);
+            notifsHelper.startStandbyNotification();
+        }
     }
 }
