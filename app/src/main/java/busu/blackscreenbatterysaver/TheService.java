@@ -24,7 +24,7 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
     public final static String EVENT_STATUS_CHANGED = "com.busu.blackscreenbatterysaver.STATUS_CHANGED";
     public final static String BROADCAST_CURRENT_STATE = "cst";
     public final static String BROADCAST_OLD_STATE = "ost";
-    public final static String EVENT_PROPERTIES_CHANGED = "com.busu.blackscreenbatterysaver.PROPS_CHANGED";
+//    public final static String EVENT_PROPERTIES_CHANGED = "com.busu.blackscreenbatterysaver.PROPS_CHANGED";
 
     private NotificationsHelper mNotifs;
     private Preferences mPrefs;
@@ -149,7 +149,7 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
             mPrefs.setHoleHeightPercentage(vpHeightPer);
             mVpCtrl.applyHoleHeigthPercentage(vpHeightPer);
             mNotifs.startOrUpdateMainNotification(new NotificationsHelper.ChangeHeightSelection(vpHeightPer));
-            sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
+//            sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
             return true;
         }
     }
@@ -177,7 +177,7 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
                     || (clickVerticalRatio > 0.5f && black.gravity == Gravity.TOP);
             mVpCtrl.changeHoleGravity(isCenterRequested, black.gravity);
             mPrefs.setHoleGravity(mVpCtrl.getHoleGravity());
-            sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
+//            sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
             incrementTutorial(true);
             LogUtil.logService("Click on: " + black.toString() + ", center req: " + isCenterRequested + ", hole gravity: "
                     + ViewPortController.getGravityString(mVpCtrl.getHoleGravity()));

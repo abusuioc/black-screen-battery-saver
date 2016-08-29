@@ -40,9 +40,8 @@ public class StarterActivity extends AppCompatActivity {
     private Preferences mPrefs;
 
     private Button mBtnStartStop, mBtnTutorial;
-    private RadioGroup mRgPos, mRgPer;
     private TextView mStatus;
-    private CheckBox mChkQuick;
+    private CheckBox mChkQuick, mChkSticky;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -52,23 +51,9 @@ public class StarterActivity extends AppCompatActivity {
                     serviceStatusChanged(
                             (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_CURRENT_STATE),
                             (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_OLD_STATE));
-                } else if (TheService.EVENT_PROPERTIES_CHANGED.equals(intent.getAction())) {
-                    mRgPer.setOnCheckedChangeListener(null);
-                    mRgPer.check(mMapHeight.get(mPrefs.getHoleHeightPercentage()));
-                    mRgPer.setOnCheckedChangeListener(mCheckListener);
-
-                    mRgPos.setOnCheckedChangeListener(null);
-                    mRgPos.check(mMapGravity.get(mPrefs.getHoleGravity()));
-                    mRgPos.setOnCheckedChangeListener(mCheckListener);
-                }
+                } /*else if (TheService.EVENT_PROPERTIES_CHANGED.equals(intent.getAction())) {
+                }*/
             }
-        }
-    };
-
-    RadioGroup.OnCheckedChangeListener mCheckListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            savePrefsAndAskServiceToApplyThem();
         }
     };
 
@@ -83,8 +68,6 @@ public class StarterActivity extends AppCompatActivity {
             return;
         }
 
-        initMapIds();
-
         setContentView(R.layout.starter);
 
         mBtnStartStop = (Button) findViewById(R.id.sBtnStartStop);
@@ -94,7 +77,6 @@ public class StarterActivity extends AppCompatActivity {
                 if (TheService.state == TheService.State.ACTIVE) {
                     startTheService(TheService.ACTION_STOP, false);
                 } else {
-                    savePrefsFromComponents();
                     checkDrawOverlayPermission();
                 }
             }
@@ -108,14 +90,6 @@ public class StarterActivity extends AppCompatActivity {
             }
         });
 
-        mRgPer = (RadioGroup) findViewById(R.id.sRgPercentage);
-        mRgPer.check(mMapHeight.get(mPrefs.getHoleHeightPercentage()));
-        mRgPer.setOnCheckedChangeListener(mCheckListener);
-
-        mRgPos = (RadioGroup) findViewById(R.id.sRgPosition);
-        mRgPos.check(mMapGravity.get(mPrefs.getHoleGravity()));
-        mRgPos.setOnCheckedChangeListener(mCheckListener);
-
         mStatus = (TextView) findViewById(R.id.sStatus);
 
         mChkQuick = (CheckBox) findViewById(R.id.sChkQuickly);
@@ -127,8 +101,17 @@ public class StarterActivity extends AppCompatActivity {
             }
         });
 
+        mChkSticky = (CheckBox) findViewById(R.id.sChkSticky);
+        mChkSticky.setChecked(mPrefs.isStickyStandbyNotif());
+        mChkSticky.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mPrefs.setStickyStandby(isChecked);
+            }
+        });
+
         final TextView rate = (TextView) findViewById(R.id.sTxtRate);
-        rate.setPaintFlags(rate.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
+        rate.setPaintFlags(rate.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         rate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -167,27 +150,11 @@ public class StarterActivity extends AppCompatActivity {
         return false;
     }
 
-    /**
-     * Currently save all configurable options and load them in the service for every option available; TODO separate for each
-     */
-
-    private void savePrefsAndAskServiceToApplyThem() {
-        savePrefsFromComponents();
-        if (TheService.state != TheService.State.STOPPED) {
-            startTheService(TheService.ACTION_READPREFS, false);
-        }
-    }
-
-    private void savePrefsFromComponents() {
-        mPrefs.setHoleGravity(mMapGravity.get(mRgPos.getCheckedRadioButtonId()));
-        mPrefs.setHoleHeightPercentage(mMapHeight.get(mRgPer.getCheckedRadioButtonId()));
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
         IntentFilter intentFilter = new IntentFilter(TheService.EVENT_STATUS_CHANGED);
-        intentFilter.addAction(TheService.EVENT_PROPERTIES_CHANGED);
+//        intentFilter.addAction(TheService.EVENT_PROPERTIES_CHANGED);
         registerReceiver(mReceiver, intentFilter);
     }
 
@@ -268,33 +235,13 @@ public class StarterActivity extends AppCompatActivity {
         }
     }
 
-    private HashMap<Integer, Integer> mMapHeight;
-    private HashMap<Integer, Integer> mMapGravity;
-
-    private void initMapIds() {
-        mMapHeight = new HashMap<>();
-        mMapHeight.put(R.id.sRbPerHalf, Preferences.HOLE_HEIGHT_PERCENTAGE_1P2);
-        mMapHeight.put(R.id.sRbPerThird, Preferences.HOLE_HEIGHT_PERCENTAGE_1P3);
-        mMapHeight.put(R.id.sRbPerFull, Preferences.HOLE_HEIGHT_PERCENTAGE_FULL);
-        mMapHeight.put(Preferences.HOLE_HEIGHT_PERCENTAGE_1P3, R.id.sRbPerThird);
-        mMapHeight.put(Preferences.HOLE_HEIGHT_PERCENTAGE_1P2, R.id.sRbPerHalf);
-        mMapHeight.put(Preferences.HOLE_HEIGHT_PERCENTAGE_FULL, R.id.sRbPerFull);
-        mMapGravity = new HashMap<>();
-        mMapGravity.put(R.id.sRbPosBottom, Gravity.BOTTOM);
-        mMapGravity.put(Gravity.BOTTOM, R.id.sRbPosBottom);
-        mMapGravity.put(R.id.sRbPosCenter, Gravity.CENTER);
-        mMapGravity.put(Gravity.CENTER, R.id.sRbPosCenter);
-        mMapGravity.put(R.id.sRbPosTop, Gravity.TOP);
-        mMapGravity.put(Gravity.TOP, R.id.sRbPosTop);
-    }
-
     public static void openAppRating(Context context) {
         Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.getPackageName()));
         boolean marketFound = false;
 
         // find all applications able to handle our rateIntent
         final List<ResolveInfo> otherApps = context.getPackageManager().queryIntentActivities(rateIntent, 0);
-        for (ResolveInfo otherApp: otherApps) {
+        for (ResolveInfo otherApp : otherApps) {
             // look for Google Play application
             if (otherApp.activityInfo.applicationInfo.packageName.equals("com.android.vending")) {
 
@@ -314,7 +261,7 @@ public class StarterActivity extends AppCompatActivity {
 
         // if GP not present on device, open web browser
         if (!marketFound) {
-            Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id="+context.getPackageName()));
+            Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + context.getPackageName()));
             context.startActivity(webIntent);
         }
     }

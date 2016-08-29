@@ -133,14 +133,17 @@ public class NotificationsHelper {
 
     //
     private NotificationCompat.Builder createStandbyBuilder() {
+        final boolean isSticky = new Preferences(mContext).isStickyStandbyNotif();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         builder.setSmallIcon(getNotificationIcon());
         builder.setContentTitle(mContext.getString(R.string.not_starter_text));
         builder.setContentText(mContext.getString(R.string.not_starter_text_sec));
         builder.setContentIntent(buildStartServicePendingIntent());
-        builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, mContext.getString(R.string.not_starter_dismiss), buildCancelStandbyNotifsIntent());
-        builder.setOngoing(true);
+        if (isSticky) {
+            builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, mContext.getString(R.string.not_starter_dismiss), buildCancelStandbyNotifsIntent());
+            builder.setOngoing(true);
+        }
         return builder;
     }
 

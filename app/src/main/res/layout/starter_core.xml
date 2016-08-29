@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="center_horizontal"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
@@ -19,104 +19,50 @@
 
     <TextView
         android:id="@+id/sStatus"
-        tools:text="started/stopped"
-        tools:textColor="@android:color/holo_green_dark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="center_horizontal"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        android:textSize="22sp" />
+        android:textSize="22sp"
+        tools:text="started/stopped"
+        tools:textColor="@android:color/holo_green_dark" />
 
     <Button
         android:id="@+id/sBtnStartStop"
-        tools:text="Start/Stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_gravity="center_horizontal"
+        tools:text="Start/Stop" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:text="@string/starter_height_text"
-        android:textSize="18sp" />
-
-    <RadioGroup
-        android:id="@+id/sRgPercentage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/sRbPerHalf"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="half (50%)"
-            android:textSize="18sp" />
-
-        <RadioButton
-            android:id="@+id/sRbPerThird"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="one third (33%)"
-            android:textSize="18sp" />
-
-        <RadioButton
-            android:id="@+id/sRbPerFull"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0 (full black)"
-            android:textSize="18sp" />
-    </RadioGroup>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/starter_position_text"
-        android:textSize="18sp" />
-
-    <RadioGroup
-        android:id="@+id/sRgPosition"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/sRbPosTop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TOP"
-            android:textSize="18sp" />
-
-        <RadioButton
-            android:id="@+id/sRbPosCenter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="CENTER"
-            android:textSize="18sp" />
-
-        <RadioButton
-            android:id="@+id/sRbPosBottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="BOTTOM"
-            android:textSize="18sp" />
-    </RadioGroup>
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/settings" />
 
     <CheckBox
         android:id="@+id/sChkQuickly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_gravity="left"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:text="@string/starter_quick" />
+        android:text="@string/starter_chk_quick" />
+
+    <CheckBox
+        android:id="@+id/sChkSticky"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/starter_chk_sticky" />
+
 
     <Button
         android:id="@+id/sBtnTutorial"
