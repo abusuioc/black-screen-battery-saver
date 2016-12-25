@@ -3,6 +3,7 @@ package busu.blackscreenbatterysaver;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.annotation.StringRes;
 import android.view.Gravity;
@@ -262,7 +263,6 @@ public class ViewPortController {
         private void initView(Context context) {
             mView = new FrameLayout(context);
             mView.setBackgroundColor(Color.BLACK);
-            mView.setDrawingCacheEnabled(true);
             mView.setWillNotDraw(false);
             mView.setOnTouchListener(new View.OnTouchListener() {
                 private static final int MAX_CLICK_DURATION_MS = 1000;
@@ -318,7 +318,7 @@ public class ViewPortController {
             mHeightRatio = ratio;
             if (mTotalHeight > 0) {
                 //after we know, round to the higher value
-                mLayoutParams.height =  (int) (mTotalHeight * mHeightRatio) + 1;
+                mLayoutParams.height = (int) (mTotalHeight * mHeightRatio) + 1;
                 changeOfLayoutParamsRequested(this);
             } else {
                 //just set the height ratio
@@ -349,6 +349,7 @@ public class ViewPortController {
                 mTutorialBox.setSingleLine(false);
                 mTutorialBox.setClickable(false);
                 mTutorialBox.setTextSize(22);
+                mTutorialBox.setTextColor(Color.LTGRAY);
                 //
                 FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 lp.gravity = Gravity.CENTER;
