@@ -32,4 +32,6 @@
 
     <string name="starter_rate">Like? Then like also on Google Play!</string>
 
+    <string name="saving">Saved %1$d minutes worth of screen time!</string>
+
 </resources>

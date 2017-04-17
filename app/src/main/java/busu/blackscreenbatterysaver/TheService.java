@@ -4,7 +4,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.view.Gravity;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Created by adibusu on 5/14/16.
@@ -79,12 +83,15 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
                 addViewPort();
                 mNotifs.cancelStandbyNotification();
                 mNotifs.startOrUpdateMainNotification(new NotificationsHelper.ChangeHeightSelection(mPrefs.getHoleHeightPercentage()));
+                updateLastTime();
                 break;
             case STOPPED:
                 if (oldState == State.ACTIVE) {
                     removeViewPort();
                     mNotifs.cancelMainNotification();
                     mNotifs.startStandbyNotification();
+                    addSaving();
+                    showSavings();
                 }
                 stopSelf();
                 break;
@@ -146,6 +153,8 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
         if (vpHeightPer == Integer.MAX_VALUE) {
             return false;
         } else {
+            addSaving();
+            //
             mPrefs.setHoleHeightPercentage(vpHeightPer);
             mVpCtrl.applyHoleHeigthPercentage(vpHeightPer);
             mNotifs.startOrUpdateMainNotification(new NotificationsHelper.ChangeHeightSelection(vpHeightPer));
@@ -226,5 +235,43 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
             mVpCtrl.hideTutorial();
         }
         mPrefs.setHasToShowTutorial(false);
+    }
+
+
+    private long totalSavingMs;
+    private long lastTime;
+
+    private void updateLastTime() {
+        lastTime = SystemClock.uptimeMillis();
+    }
+
+    private long getTimeDifference() {
+        final long dif = SystemClock.uptimeMillis() - lastTime;
+        //just to be safe
+        return dif < 0 ? 0 : dif;
+    }
+
+    private void addSaving() {
+        final int blackScreenPercentage = 100 - mPrefs.getHoleHeightPercentage();
+        final long timeDiffMs = getTimeDifference();
+        final long timeSaved = timeDiffMs * blackScreenPercentage / 100;
+        totalSavingMs += timeSaved;
+//        Toast.makeText(this, "S: " + timeDiffMs / 1000 + "s, hp%: " + blackScreenPercentage + " :: total = " + totalSavingMs / 1000, Toast.LENGTH_LONG).show();
+        updateLastTime();
+    }
+
+    private final static int MEANINGFUL_SAVING_TIME_MINUTES = 1; //at least 1min
+
+    private void showSavings() {
+        int timeInMins = (int) (totalSavingMs / 60000);
+        if (timeInMins > MEANINGFUL_SAVING_TIME_MINUTES) {
+            View toastView = View.inflate(this, R.layout.saving_toast, null);
+            ((TextView) toastView.findViewById(R.id.saving_text)).setText(getString(R.string.saving, timeInMins));
+            //use this creator because otherwise the LENGTH_LONG is ignored (stupid bug)
+            Toast toast = Toast.makeText(this, R.string.saving, Toast.LENGTH_LONG);
+            toast.setView(toastView);
+            toast.show();
+        }
+        totalSavingMs = 0;
     }
 }
