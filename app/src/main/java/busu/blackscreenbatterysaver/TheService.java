@@ -260,7 +260,7 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
         updateLastTime();
     }
 
-    private final static int MEANINGFUL_SAVING_TIME_MINUTES = 1; //at least 1min
+    private final static int MEANINGFUL_SAVING_TIME_MINUTES = 2; //at least 2mins
 
     private void showSavings() {
         int timeInMins = (int) (totalSavingMs / 60000);
