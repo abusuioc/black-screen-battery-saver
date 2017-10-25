@@ -148,7 +148,7 @@ public class NotificationsHelper {
     //
     private NotificationCompat.Builder createStandbyBuilder() {
         final boolean isSticky = new Preferences(mContext).isStickyStandbyNotif();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, CHANNEL_ID);
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         builder.setSmallIcon(getNotificationIcon());
         builder.setContentTitle(mContext.getString(R.string.not_starter_text));
