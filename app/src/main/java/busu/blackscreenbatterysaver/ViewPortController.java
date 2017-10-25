@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.support.annotation.StringRes;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -224,11 +225,19 @@ public class ViewPortController {
             mLayoutParams = new WindowManager.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    WindowManager.LayoutParams.TYPE_PHONE,
+                    getWindowOverlayType(),
                     getWindowFlags(),
                     PixelFormat.OPAQUE);
             mLayoutParams.gravity = Gravity.LEFT | gravity;
             disableAnimations();
+        }
+
+        private int getWindowOverlayType() {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                return WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+            }else{
+                return WindowManager.LayoutParams.TYPE_PHONE;
+            }
         }
 
         /**

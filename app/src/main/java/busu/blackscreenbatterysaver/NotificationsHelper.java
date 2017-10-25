@@ -1,10 +1,12 @@
 package busu.blackscreenbatterysaver;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.NotificationCompat;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 /**
@@ -14,6 +16,7 @@ public class NotificationsHelper {
 
     private final static int ID_MAIN = 998822;
     private final static int ID_STANDBY = 62344;
+    private final static String CHANNEL_ID= "bsbs_id";
 
     private Context mContext;
     private NotificationManager mNotificationsManager;
@@ -21,10 +24,21 @@ public class NotificationsHelper {
     public NotificationsHelper(Context theService) {
         mContext = theService;
         mNotificationsManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        initChannels(theService, mNotificationsManager);
+    }
+
+    public void initChannels(Context context, NotificationManager notificationManager) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                    context.getString(R.string.app_name),
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription(context.getString(R.string.notifs_channel_descr));
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     private NotificationCompat.Builder createMainBuilder(ChangeNotificationBody changer) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, CHANNEL_ID);
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         builder.setSmallIcon(getNotificationIcon());
         RemoteViews body = getComplexNotificationView();

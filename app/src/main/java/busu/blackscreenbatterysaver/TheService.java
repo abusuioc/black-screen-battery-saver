@@ -201,9 +201,11 @@ public class TheService extends Service implements ViewPortController.OnTouchEve
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         LogUtil.logService("Configuration changed ");
-        removeViewPort();
-        mVpCtrl = new ViewPortController(this, this);
-        addViewPort();
+        if (state == State.ACTIVE) {
+            removeViewPort();
+            mVpCtrl = new ViewPortController(this, this);
+            addViewPort();
+        }
     }
 
     enum State {

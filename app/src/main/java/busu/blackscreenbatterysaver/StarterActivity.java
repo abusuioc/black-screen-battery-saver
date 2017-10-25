@@ -70,7 +70,7 @@ public class StarterActivity extends AppCompatActivity {
 
         setContentView(R.layout.starter);
 
-        mBtnStartStop = (Button) findViewById(R.id.sBtnStartStop);
+        mBtnStartStop = findViewById(R.id.sBtnStartStop);
         mBtnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,7 +82,7 @@ public class StarterActivity extends AppCompatActivity {
             }
         });
 
-        mBtnTutorial = (Button) findViewById(R.id.sBtnTutorial);
+        mBtnTutorial = findViewById(R.id.sBtnTutorial);
         mBtnTutorial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,9 +90,9 @@ public class StarterActivity extends AppCompatActivity {
             }
         });
 
-        mStatus = (TextView) findViewById(R.id.sStatus);
+        mStatus = findViewById(R.id.sStatus);
 
-        mChkQuick = (CheckBox) findViewById(R.id.sChkQuickly);
+        mChkQuick = findViewById(R.id.sChkQuickly);
         mChkQuick.setChecked(mPrefs.hasToQuickStart());
         mChkQuick.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -101,7 +101,7 @@ public class StarterActivity extends AppCompatActivity {
             }
         });
 
-        mChkSticky = (CheckBox) findViewById(R.id.sChkSticky);
+        mChkSticky = findViewById(R.id.sChkSticky);
         mChkSticky.setChecked(mPrefs.isStickyStandbyNotif());
         mChkSticky.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -110,7 +110,7 @@ public class StarterActivity extends AppCompatActivity {
             }
         });
 
-        final TextView rate = (TextView) findViewById(R.id.sTxtRate);
+        final TextView rate = findViewById(R.id.sTxtRate);
         rate.setPaintFlags(rate.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         rate.setOnClickListener(new View.OnClickListener() {
             @Override

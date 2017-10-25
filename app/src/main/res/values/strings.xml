@@ -34,4 +34,6 @@
 
     <string name="saving">Saved %1$d minutes worth of screen time!</string>
 
+    <string name="notifs_channel_descr">___</string>
+
 </resources>
