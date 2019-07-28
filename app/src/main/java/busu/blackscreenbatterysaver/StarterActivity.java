@@ -17,15 +17,12 @@ import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -47,11 +44,11 @@ public class StarterActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                if (TheService.EVENT_STATUS_CHANGED.equals(intent.getAction())) {
+                if (BlackScotService.EVENT_STATUS_CHANGED.equals(intent.getAction())) {
                     serviceStatusChanged(
-                            (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_CURRENT_STATE),
-                            (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_OLD_STATE));
-                } /*else if (TheService.EVENT_PROPERTIES_CHANGED.equals(intent.getAction())) {
+                            (BlackScotService.State) intent.getSerializableExtra(BlackScotService.BROADCAST_CURRENT_STATE),
+                            (BlackScotService.State) intent.getSerializableExtra(BlackScotService.BROADCAST_OLD_STATE));
+                } /*else if (BlackScotService.EVENT_PROPERTIES_CHANGED.equals(intent.getAction())) {
                 }*/
             }
         }
@@ -74,8 +71,8 @@ public class StarterActivity extends AppCompatActivity {
         mBtnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (TheService.state == TheService.State.ACTIVE) {
-                    startTheService(TheService.ACTION_STOP, false);
+                if (BlackScotService.state == BlackScotService.State.ACTIVE) {
+                    startTheService(BlackScotService.ACTION_STOP, false);
                 } else {
                     checkDrawOverlayPermission();
                 }
@@ -86,7 +83,7 @@ public class StarterActivity extends AppCompatActivity {
         mBtnTutorial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startTheService(TheService.ACTION_TUTORIAL, true);
+                startTheService(BlackScotService.ACTION_TUTORIAL, true);
             }
         });
 
@@ -119,14 +116,14 @@ public class StarterActivity extends AppCompatActivity {
             }
         });
 
-        serviceStatusChanged(TheService.state, null);
+        serviceStatusChanged(BlackScotService.state, null);
     }
 
     private boolean hasToCancelActivityAndStartService(boolean isAfterConfigChange) {
         //call this so that it does the hack of getting first time ever starting the app a false and setting it to true for next uses
         boolean isQuick = mPrefs.hasToQuickStart();
 
-        if (TheService.state == TheService.State.ACTIVE || !canDrawOverlay(this)) {
+        if (BlackScotService.state == BlackScotService.State.ACTIVE || !canDrawOverlay(this)) {
             //start activity if service is already running: users want to configure smth
             return false;
         }
@@ -153,7 +150,7 @@ public class StarterActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        IntentFilter intentFilter = new IntentFilter(TheService.EVENT_STATUS_CHANGED);
+        IntentFilter intentFilter = new IntentFilter(BlackScotService.EVENT_STATUS_CHANGED);
         registerReceiver(mReceiver, intentFilter);
     }
 
@@ -202,7 +199,7 @@ public class StarterActivity extends AppCompatActivity {
     }
 
     private void startTheService() {
-        startTheService(TheService.ACTION_START, true);
+        startTheService(BlackScotService.ACTION_START, true);
     }
 
     /**
@@ -212,16 +209,16 @@ public class StarterActivity extends AppCompatActivity {
      * @param hasToCloseActivity
      */
     private void startTheService(String action, boolean hasToCloseActivity) {
-        if (action == TheService.ACTION_START || TheService.state == TheService.State.ACTIVE) {
-            startService(new Intent(StarterActivity.this, TheService.class).setAction(action));
+        if (action == BlackScotService.ACTION_START || BlackScotService.state == BlackScotService.State.ACTIVE) {
+            startService(new Intent(StarterActivity.this, BlackScotService.class).setAction(action));
             if (hasToCloseActivity) {
                 finish();
             }
         }
     }
 
-    private void serviceStatusChanged(TheService.State currentState, TheService.State oldState) {
-        final boolean isStarted = (TheService.State.ACTIVE == currentState);
+    private void serviceStatusChanged(BlackScotService.State currentState, BlackScotService.State oldState) {
+        final boolean isStarted = (BlackScotService.State.ACTIVE == currentState);
         //
         mBtnStartStop.setText(isStarted ? R.string.btn_stop : R.string.btn_start);
         mStatus.setText(isStarted ? R.string.status_started : R.string.status_stopped);

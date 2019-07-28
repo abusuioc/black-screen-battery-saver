@@ -44,11 +44,11 @@ public class NotificationsHelper {
         RemoteViews body = getComplexNotificationView();
         builder.setContent(body);
 
-        PendingIntent intent1p2 = buildPendingIntentFor(TheService.ACTION_SIZE_1P2);
-        PendingIntent intent1p3 = buildPendingIntentFor(TheService.ACTION_SIZE_1P3);
-        PendingIntent intentFull = buildPendingIntentFor(TheService.ACTION_SIZE_FULL);
-        PendingIntent intentStop = buildPendingIntentFor(TheService.ACTION_STOP);
-        PendingIntent intentTutorial = buildPendingIntentFor(TheService.ACTION_TUTORIAL);
+        PendingIntent intent1p2 = buildPendingIntentFor(BlackScotService.ACTION_SIZE_1P2);
+        PendingIntent intent1p3 = buildPendingIntentFor(BlackScotService.ACTION_SIZE_1P3);
+        PendingIntent intentFull = buildPendingIntentFor(BlackScotService.ACTION_SIZE_FULL);
+        PendingIntent intentStop = buildPendingIntentFor(BlackScotService.ACTION_STOP);
+        PendingIntent intentTutorial = buildPendingIntentFor(BlackScotService.ACTION_TUTORIAL);
 
         body.setOnClickPendingIntent(R.id.notifSize1p2, intent1p2);
         body.setOnClickPendingIntent(R.id.notifSize1p3, intent1p3);
@@ -71,7 +71,7 @@ public class NotificationsHelper {
     }
 
     private PendingIntent buildPendingIntentFor(String action) {
-        Intent intent = new Intent(action, null, mContext, TheService.class);
+        Intent intent = new Intent(action, null, mContext, BlackScotService.class);
         PendingIntent pendingIntent = PendingIntent.getService(mContext, 0, intent, 0);
         return pendingIntent;
     }
@@ -84,8 +84,8 @@ public class NotificationsHelper {
     }
 
     private PendingIntent buildStartServicePendingIntent() {
-        Intent intent = new Intent(mContext, TheService.class);
-        intent.setAction(TheService.ACTION_START);
+        Intent intent = new Intent(mContext, BlackScotService.class);
+        intent.setAction(BlackScotService.ACTION_START);
         return PendingIntent.getService(mContext, 0, intent, 0);
     }
 

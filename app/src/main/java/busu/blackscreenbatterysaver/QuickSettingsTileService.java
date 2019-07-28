@@ -14,21 +14,21 @@ public class QuickSettingsTileService extends TileService {
     @Override
     public void onTileAdded() {
         super.onTileAdded();
-        blackScotServiceStatusChangedTo(TheService.state);
+        blackScotServiceStatusChangedTo(BlackScotService.state);
     }
 
     @Override
     public void onStartListening() {
         super.onStartListening();
-        blackScotServiceStatusChangedTo(TheService.state);
-        IntentFilter intentFilter = new IntentFilter(TheService.EVENT_STATUS_CHANGED);
+        blackScotServiceStatusChangedTo(BlackScotService.state);
+        IntentFilter intentFilter = new IntentFilter(BlackScotService.EVENT_STATUS_CHANGED);
         registerReceiver(blackScotServiceStatusReceiver, intentFilter);
     }
 
     @Override
     public void onStopListening() {
         super.onStopListening();
-        blackScotServiceStatusChangedTo(TheService.state);
+        blackScotServiceStatusChangedTo(BlackScotService.state);
         unregisterReceiver(blackScotServiceStatusReceiver);
     }
 
@@ -38,10 +38,10 @@ public class QuickSettingsTileService extends TileService {
         Tile tile = getQsTile();
         switch (tile.getState()) {
             case Tile.STATE_ACTIVE:
-                sendActionToBlackScotService(TheService.ACTION_STOP);
+                sendActionToBlackScotService(BlackScotService.ACTION_STOP);
                 break;
             case Tile.STATE_INACTIVE:
-                sendActionToBlackScotService(TheService.ACTION_START);
+                sendActionToBlackScotService(BlackScotService.ACTION_START);
                 break;
             default:
         }
@@ -52,17 +52,17 @@ public class QuickSettingsTileService extends TileService {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                if (TheService.EVENT_STATUS_CHANGED.equals(intent.getAction())) {
+                if (BlackScotService.EVENT_STATUS_CHANGED.equals(intent.getAction())) {
                     blackScotServiceStatusChangedTo(
-                            (TheService.State) intent.getSerializableExtra(TheService.BROADCAST_CURRENT_STATE));
+                            (BlackScotService.State) intent.getSerializableExtra(BlackScotService.BROADCAST_CURRENT_STATE));
                 }
             }
         }
     };
 
-    private void blackScotServiceStatusChangedTo(TheService.State currentState) {
+    private void blackScotServiceStatusChangedTo(BlackScotService.State currentState) {
         Tile tile = getQsTile();
-        final boolean isStarted = (TheService.State.ACTIVE == currentState);
+        final boolean isStarted = (BlackScotService.State.ACTIVE == currentState);
         final boolean isEnabled = StarterActivity.canDrawOverlay(this);
         if (!isEnabled) {
             tile.setState(Tile.STATE_UNAVAILABLE);
@@ -75,6 +75,6 @@ public class QuickSettingsTileService extends TileService {
     }
 
     private void sendActionToBlackScotService(String action) {
-        startService(new Intent(this, TheService.class).setAction(action));
+        startService(new Intent(this, BlackScotService.class).setAction(action));
     }
 }

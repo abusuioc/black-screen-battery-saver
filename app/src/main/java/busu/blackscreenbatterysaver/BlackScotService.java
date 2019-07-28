@@ -13,7 +13,7 @@ import android.widget.Toast;
 /**
  * Created by adibusu on 5/14/16.
  */
-public class TheService extends Service implements ViewPortController.OnTouchEvents {
+public class BlackScotService extends Service implements ViewPortController.OnTouchEvents {
 
     public final static String ACTION_SIZE_1P2 = "1p2";
     public final static String ACTION_SIZE_1P3 = "1p3";
