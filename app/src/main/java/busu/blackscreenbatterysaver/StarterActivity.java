@@ -19,8 +19,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.List;
@@ -36,7 +34,6 @@ public class StarterActivity extends AppCompatActivity {
 
     private Button mBtnStartStop, mBtnTutorial;
     private TextView mStatus;
-    private CheckBox mChkQuick;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -85,15 +82,6 @@ public class StarterActivity extends AppCompatActivity {
 
         mStatus = findViewById(R.id.sStatus);
 
-        mChkQuick = findViewById(R.id.sChkQuickly);
-        mChkQuick.setChecked(mPrefs.hasToQuickStart());
-        mChkQuick.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mPrefs.setQuickStart(isChecked);
-            }
-        });
-
         final TextView rate = findViewById(R.id.sTxtRate);
         rate.setPaintFlags(rate.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         rate.setOnClickListener(new View.OnClickListener() {
@@ -107,9 +95,6 @@ public class StarterActivity extends AppCompatActivity {
     }
 
     private boolean hasToCancelActivityAndStartService(boolean isAfterConfigChange) {
-        //call this so that it does the hack of getting first time ever starting the app a false and setting it to true for next uses
-        boolean isQuick = mPrefs.hasToQuickStart();
-
         if (BlackScotService.state == BlackScotService.State.ACTIVE || !canDrawOverlay(this)) {
             //start activity if service is already running: users want to configure smth
             return false;
@@ -128,7 +113,7 @@ public class StarterActivity extends AppCompatActivity {
         startIntent.setAction(ACTION_PREVENT_QUICKSTART);
         setIntent(startIntent);
 
-        if (isQuick && !ACTION_PREVENT_QUICKSTART.equals(startAction) && !isAfterConfigChange) {
+        if (!ACTION_PREVENT_QUICKSTART.equals(startAction) && !isAfterConfigChange) {
             return true;
         }
         return false;
