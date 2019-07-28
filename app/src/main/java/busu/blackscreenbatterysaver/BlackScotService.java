@@ -27,8 +27,6 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
 
     public final static String EVENT_STATUS_CHANGED = "com.busu.blackscreenbatterysaver.STATUS_CHANGED";
     public final static String BROADCAST_CURRENT_STATE = "cst";
-    public final static String BROADCAST_OLD_STATE = "ost";
-//    public final static String EVENT_PROPERTIES_CHANGED = "com.busu.blackscreenbatterysaver.PROPS_CHANGED";
 
     private NotificationsHelper mNotifs;
     private Preferences mPrefs;
@@ -59,15 +57,12 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
 
 
     private void changeServiceState(State newState) {
-        LogUtil.logService("State changed from " + state + " to " + newState);
-        if (state != newState) {
-            final State oldState = state;
-            state = newState;
-            applyCurrentServiceState(newState, oldState);
-            sendBroadcast(new Intent(EVENT_STATUS_CHANGED)
-                    .putExtra(BROADCAST_CURRENT_STATE, newState)
-                    .putExtra(BROADCAST_OLD_STATE, oldState));
-        }
+        final State oldState = state;
+        state = newState;
+        applyCurrentServiceState(newState, oldState);
+        LogUtil.logService("State changed from " + oldState + " to " + newState);
+        sendBroadcast(new Intent(EVENT_STATUS_CHANGED)
+                .putExtra(BROADCAST_CURRENT_STATE, newState));
     }
 
     private void applyCurrentServiceState(State currentState, State oldState) {
@@ -118,8 +113,6 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
                     // ^ takes care of it
                     hasToCloseSystemBar = false;
                 } else if (action.equals(ACTION_STOP)) {
-//                    changeServiceState(State.STANDBY);
-                    // ^ ok in the scenario in which we allow service to live forever
                     changeServiceState(State.STOPPED);
                 } else if (action.equals(ACTION_START)) {
                     changeServiceState(State.ACTIVE);
@@ -158,7 +151,6 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
             mPrefs.setHoleHeightPercentage(vpHeightPer);
             mVpCtrl.applyHoleHeigthPercentage(vpHeightPer);
             mNotifs.startOrUpdateMainNotification(new NotificationsHelper.ChangeHeightSelection(vpHeightPer));
-//            sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
             return true;
         }
     }
@@ -186,7 +178,6 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
                     || (clickVerticalRatio > 0.5f && black.gravity == Gravity.TOP);
             mVpCtrl.changeHoleGravity(isCenterRequested, black.gravity);
             mPrefs.setHoleGravity(mVpCtrl.getHoleGravity());
-//            sendBroadcast(new Intent(EVENT_PROPERTIES_CHANGED));
             incrementTutorial(true);
             LogUtil.logService("Click on: " + black.toString() + ", center req: " + isCenterRequested + ", hole gravity: "
                     + ViewPortController.getGravityString(mVpCtrl.getHoleGravity()));
@@ -249,7 +240,6 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
 
     private long getTimeDifference() {
         final long dif = SystemClock.uptimeMillis() - lastTime;
-        //just to be safe
         return dif < 0 ? 0 : dif;
     }
 
@@ -258,7 +248,6 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
         final long timeDiffMs = getTimeDifference();
         final long timeSaved = timeDiffMs * blackScreenPercentage / 100;
         totalSavingMs += timeSaved;
-//        Toast.makeText(this, "S: " + timeDiffMs / 1000 + "s, hp%: " + blackScreenPercentage + " :: total = " + totalSavingMs / 1000, Toast.LENGTH_LONG).show();
         updateLastTime();
     }
 

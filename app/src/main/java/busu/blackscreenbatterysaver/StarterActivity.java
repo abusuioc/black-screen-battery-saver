@@ -30,8 +30,6 @@ import java.util.List;
  */
 public class StarterActivity extends AppCompatActivity {
 
-    public final static String TAG = "BSBS";
-
     public final static String ACTION_PREVENT_QUICKSTART = "com.busu.blackscreenbatterysaver.ACTION_PREVENT_QUICK";
 
     private Preferences mPrefs;
@@ -46,10 +44,8 @@ public class StarterActivity extends AppCompatActivity {
             if (intent != null) {
                 if (BlackScotService.EVENT_STATUS_CHANGED.equals(intent.getAction())) {
                     serviceStatusChanged(
-                            (BlackScotService.State) intent.getSerializableExtra(BlackScotService.BROADCAST_CURRENT_STATE),
-                            (BlackScotService.State) intent.getSerializableExtra(BlackScotService.BROADCAST_OLD_STATE));
-                } /*else if (BlackScotService.EVENT_PROPERTIES_CHANGED.equals(intent.getAction())) {
-                }*/
+                            (BlackScotService.State) intent.getSerializableExtra(BlackScotService.BROADCAST_CURRENT_STATE));
+                }
             }
         }
     };
@@ -116,7 +112,7 @@ public class StarterActivity extends AppCompatActivity {
             }
         });
 
-        serviceStatusChanged(BlackScotService.state, null);
+        serviceStatusChanged(BlackScotService.state);
     }
 
     private boolean hasToCancelActivityAndStartService(boolean isAfterConfigChange) {
@@ -217,7 +213,7 @@ public class StarterActivity extends AppCompatActivity {
         }
     }
 
-    private void serviceStatusChanged(BlackScotService.State currentState, BlackScotService.State oldState) {
+    private void serviceStatusChanged(BlackScotService.State currentState) {
         final boolean isStarted = (BlackScotService.State.ACTIVE == currentState);
         //
         mBtnStartStop.setText(isStarted ? R.string.btn_stop : R.string.btn_start);
