@@ -3,7 +3,6 @@ package busu.blackscreenbatterysaver;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.StringRes;

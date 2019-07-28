@@ -36,7 +36,7 @@ public class StarterActivity extends AppCompatActivity {
 
     private Button mBtnStartStop, mBtnTutorial;
     private TextView mStatus;
-    private CheckBox mChkQuick, mChkSticky;
+    private CheckBox mChkQuick;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -91,15 +91,6 @@ public class StarterActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mPrefs.setQuickStart(isChecked);
-            }
-        });
-
-        mChkSticky = findViewById(R.id.sChkSticky);
-        mChkSticky.setChecked(mPrefs.isStickyStandbyNotif());
-        mChkSticky.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mPrefs.setStickyStandby(isChecked);
             }
         });
 

@@ -15,7 +15,6 @@ import android.widget.RemoteViews;
 public class NotificationsHelper {
 
     private final static int ID_MAIN = 998822;
-    private final static int ID_STANDBY = 62344;
     private final static String CHANNEL_ID= "bsbs_id";
 
     private Context mContext;
@@ -143,41 +142,4 @@ public class NotificationsHelper {
             }
         }
     }
-
-
-    //
-    private NotificationCompat.Builder createStandbyBuilder() {
-        final boolean isSticky = new Preferences(mContext).isStickyStandbyNotif();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, CHANNEL_ID);
-        builder.setPriority(NotificationCompat.PRIORITY_HIGH);
-        builder.setSmallIcon(getNotificationIcon());
-        builder.setContentTitle(mContext.getString(R.string.not_starter_text));
-        builder.setContentText(mContext.getString(R.string.not_starter_text_sec));
-        builder.setContentIntent(buildStartServicePendingIntent());
-        if (isSticky) {
-            builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, mContext.getString(R.string.not_starter_dismiss), buildCancelStandbyNotifsIntent());
-            builder.setOngoing(true);
-        }
-        return builder;
-    }
-
-    public void startStandbyNotification() {
-        final NotificationCompat.Builder builder = createStandbyBuilder();
-        fireNotification(ID_STANDBY, builder);
-    }
-
-    public void cancelStandbyNotification() {
-        cancelNotification(ID_STANDBY);
-    }
-
-    public static void cancelStandbyNotification(Context context) {
-        final NotificationsHelper notifsHelp = new NotificationsHelper(context);
-        notifsHelp.cancelStandbyNotification();
-    }
-
-    private PendingIntent buildCancelStandbyNotifsIntent() {
-        final Intent cancel = new Intent("busu.blackscreenbatterysaver.cancel_standby");
-        return PendingIntent.getBroadcast(mContext, 0, cancel, PendingIntent.FLAG_CANCEL_CURRENT);
-    }
-
 }

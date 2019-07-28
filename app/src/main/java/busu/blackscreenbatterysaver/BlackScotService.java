@@ -71,12 +71,10 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
                 if (oldState == State.ACTIVE) {
                     removeViewPort();
                     mNotifs.cancelMainNotification();
-                    mNotifs.startStandbyNotification();
                 }
                 break;
             case ACTIVE:
                 addViewPort();
-                mNotifs.cancelStandbyNotification();
                 mNotifs.startOrUpdateMainNotification(new NotificationsHelper.ChangeHeightSelection(mPrefs.getHoleHeightPercentage()));
                 updateLastTime();
                 break;
@@ -84,7 +82,6 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
                 if (oldState == State.ACTIVE) {
                     removeViewPort();
                     mNotifs.cancelMainNotification();
-                    mNotifs.startStandbyNotification();
                     addSaving();
                     showSavings();
                 }
