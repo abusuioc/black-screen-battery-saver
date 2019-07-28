@@ -154,7 +154,6 @@ public class StarterActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         IntentFilter intentFilter = new IntentFilter(TheService.EVENT_STATUS_CHANGED);
-//        intentFilter.addAction(TheService.EVENT_PROPERTIES_CHANGED);
         registerReceiver(mReceiver, intentFilter);
     }
 

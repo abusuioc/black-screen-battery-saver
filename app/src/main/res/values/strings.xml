@@ -7,7 +7,6 @@
     <string name="service_started">Service started</string>
     <string name="status_stopped">stopped</string>
 
-    <string name="shakeSensitivity">Shake sensitivity:</string>
     <string name="overlay_enabling_dialog">The service saves battery by putting screen pixels in off state.\n\nFor this to work, you\'ll be prompted in the next screen to enable the \'drawing over other apps\' permission.</string>
     <string name="overlay_proceed">Proceed</string>
     <string name="overlay_cancel">Cancel</string>
@@ -35,5 +34,4 @@
     <string name="saving">Saved %1$d minutes worth of screen time!</string>
 
     <string name="notifs_channel_descr">___</string>
-
 </resources>
