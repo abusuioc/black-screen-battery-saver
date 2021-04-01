@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.support.annotation.StringRes;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -14,6 +13,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import androidx.annotation.StringRes;
 
 import java.util.HashMap;
 import java.util.Map;
