@@ -8,6 +8,7 @@ import android.os.Build;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class QuickSettingsTileService extends TileService {
@@ -22,7 +23,7 @@ public class QuickSettingsTileService extends TileService {
         super.onStartListening();
         blackScotServiceStatusChangedTo(BlackScotService.state);
         IntentFilter intentFilter = new IntentFilter(BlackScotService.EVENT_STATUS_CHANGED);
-        registerReceiver(blackScotServiceStatusReceiver, intentFilter);
+        ContextCompat.registerReceiver(this, blackScotServiceStatusReceiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     @Override

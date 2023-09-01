@@ -3,6 +3,7 @@ package busu.blackscreenbatterysaver;
 import android.app.Service;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.view.Gravity;
@@ -105,10 +106,7 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
             final String action = intent.getAction();
             LogUtil.logService("Action received: " + action + " in state: " + state);
             if (action != null) {
-                boolean hasToCloseSystemBar = true;
                 if (commandChangeSize(action)) {
-                    // ^ takes care of it
-                    hasToCloseSystemBar = false;
                 } else if (action.equals(ACTION_STOP)) {
                     changeServiceState(State.STOPPED);
                 } else if (action.equals(ACTION_START)) {
@@ -120,9 +118,6 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
                     mTutorialStep = 0;
                     mPrefs.setHasToShowTutorial(true);
                     loadTutorial();
-                }
-                if (hasToCloseSystemBar) {
-                    sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
                 }
             }
         }

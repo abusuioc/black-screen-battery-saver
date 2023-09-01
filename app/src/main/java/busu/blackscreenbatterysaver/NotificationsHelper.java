@@ -72,7 +72,7 @@ public class NotificationsHelper {
 
     private PendingIntent buildPendingIntentFor(String action) {
         Intent intent = new Intent(action, null, mContext, BlackScotService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(mContext, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getService(mContext, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         return pendingIntent;
     }
 
@@ -80,13 +80,13 @@ public class NotificationsHelper {
         Intent intent = new Intent(mContext, StarterActivity.class);
         intent.setAction(StarterActivity.ACTION_PREVENT_QUICKSTART);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     private PendingIntent buildStartServicePendingIntent() {
         Intent intent = new Intent(mContext, BlackScotService.class);
         intent.setAction(BlackScotService.ACTION_START);
-        return PendingIntent.getService(mContext, 0, intent, 0);
+        return PendingIntent.getService(mContext, 0, intent, PendingIntent.FLAG_IMMUTABLE);
     }
 
     private RemoteViews getComplexNotificationView() {
