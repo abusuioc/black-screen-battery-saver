@@ -2,45 +2,65 @@ package busu.blackscreenbatterysaver;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.view.Gravity;
 
-/**
- * Created by adibusu on 6/5/16.
- */
+import androidx.annotation.NonNull;
+
 public class Preferences {
 
     private final static String KEY_HEIGHT = "kh";
     private final static String KEY_POS = "kp";
     private final static String KEY_TUTORIAL = "ktut";
+    private final static String KEY_FULL_OPAQUE = "kfo";
 
-    private SharedPreferences mPrefs;
+    private final SharedPreferences mPrefs;
 
     public Preferences(Context context) {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public static final int HOLE_HEIGHT_PERCENTAGE_1P3 = 33;
-    public static final int HOLE_HEIGHT_PERCENTAGE_1P2 = 50;
-    public static final int HOLE_HEIGHT_PERCENTAGE_FULL = 0;
-    public static final int DEFAULT_HOLE_HEIGHT_PERCENTAGE = HOLE_HEIGHT_PERCENTAGE_1P2;
+    public enum ViewportHeight {
+        ZERO(0), HALF(50), THIRD(33);
 
-    public int getHoleHeightPercentage() {
-        return mPrefs.getInt(KEY_HEIGHT, DEFAULT_HOLE_HEIGHT_PERCENTAGE);
+        private final int mPercentage;
+        ViewportHeight(int percentage) {
+            this.mPercentage = percentage;
+        }
+
+        public int getPercentage() {
+            return mPercentage;
+        }
+
+        @NonNull
+        public static ViewportHeight fromAcceptedPercentages(int value) {
+            for (ViewportHeight type : values()) {
+                if (type.getPercentage() == value) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("Cannot create from " + value);
+        }
     }
 
-    public void setHoleHeightPercentage(int holeHeightPercentage) {
-        mPrefs.edit().putInt(KEY_HEIGHT, holeHeightPercentage).apply();
+    public static final ViewportHeight DEFAULT_HOLE_HEIGHT_PERCENTAGE = ViewportHeight.HALF;
+
+    public ViewportHeight getViewportHeight() {
+        return ViewportHeight.fromAcceptedPercentages(mPrefs.getInt(KEY_HEIGHT, DEFAULT_HOLE_HEIGHT_PERCENTAGE.getPercentage()));
+    }
+
+    public void setViewportHeight(ViewportHeight viewportHeight) {
+        mPrefs.edit().putInt(KEY_HEIGHT, viewportHeight.getPercentage()).apply();
     }
 
     public final static int DEFAULT_HOLE_GRAVITY = Gravity.BOTTOM;
 
-    public int getHoleGravity() {
+    public int getViewportGravity() {
         return mPrefs.getInt(KEY_POS, DEFAULT_HOLE_GRAVITY);
     }
 
-    public void setHoleGravity(int holePosition) {
-        mPrefs.edit().putInt(KEY_POS, holePosition).apply();
+    public void setViewportGravity(int viewportGravity) {
+        mPrefs.edit().putInt(KEY_POS, viewportGravity).apply();
     }
 
     public final static boolean DEFAULT_SHOW_TUTORIAL = true;
@@ -51,5 +71,15 @@ public class Preferences {
 
     public void setHasToShowTutorial(boolean hasToShowTutorial) {
         mPrefs.edit().putBoolean(KEY_TUTORIAL, hasToShowTutorial).apply();
+    }
+
+    public final static boolean DEFAULT_FULL_OPAQUE = true;
+
+    public boolean isFullOpaque() {
+        return mPrefs.getBoolean(KEY_FULL_OPAQUE, DEFAULT_FULL_OPAQUE);
+    }
+
+    public void setIsFullOpaque(boolean isFullOpaque) {
+        mPrefs.edit().putBoolean(KEY_FULL_OPAQUE, isFullOpaque).apply();
     }
 }

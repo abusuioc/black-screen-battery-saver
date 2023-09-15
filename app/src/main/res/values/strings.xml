@@ -28,4 +28,16 @@
     <string name="saving">Saved %1$d minutes worth of screen time!</string>
 
     <string name="notifs_channel_descr">___</string>
+
+    <string name="menu_viewport_size_title">Set height</string>
+    <string name="menu_viewport_size_0">Zero</string>
+    <string name="menu_viewport_size_half">Half screen</string>
+    <string name="menu_viewport_size_third">One third</string>
+    <string name="menu_viewport_tutorial">Tutorial</string>
+    <string name="menu_viewport_settings">Settings</string>
+    <string name="menu_viewport_transparency">Set transparency</string>
+    <string name="menu_viewport_transparency_opaque">Opaque</string>
+    <string name="menu_viewport_transparency_seethrough">See through</string>
+
+
 </resources>

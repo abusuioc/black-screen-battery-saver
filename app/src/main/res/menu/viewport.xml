@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="@string/menu_viewport_size_title">
+        <menu>
+            <item
+                android:id="@+id/menu_viewport_size_half"
+                android:title="@string/menu_viewport_size_half" />
+            <item
+                android:id="@+id/menu_viewport_size_third"
+                android:title="@string/menu_viewport_size_third" />
+            <item
+                android:id="@+id/menu_viewport_size_zero"
+                android:title="@string/menu_viewport_size_0" />
+        </menu>
+    </item>
+    <item android:title="@string/menu_viewport_transparency">
+        <menu>
+            <item
+                android:id="@+id/menu_viewport_transparency_opaque"
+                android:title="@string/menu_viewport_transparency_opaque" />
+            <item
+                android:id="@+id/menu_viewport_transparency_seethrough"
+                android:title="@string/menu_viewport_transparency_seethrough" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menu_viewport_tutorial"
+        android:title="@string/menu_viewport_tutorial" />
+    <item
+        android:id="@+id/menu_viewport_settings"
+        android:title="@string/menu_viewport_settings" />
+</menu>

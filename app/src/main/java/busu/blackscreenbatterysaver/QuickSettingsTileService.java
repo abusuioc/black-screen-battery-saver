@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
+
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
@@ -39,17 +40,17 @@ public class QuickSettingsTileService extends TileService {
         Tile tile = getQsTile();
         switch (tile.getState()) {
             case Tile.STATE_ACTIVE:
-                sendActionToBlackScotService(BlackScotService.ACTION_STOP);
+                sendActionToBlackScotService(BlackScotService.Action.STOP_SERVICE);
                 break;
             case Tile.STATE_INACTIVE:
-                sendActionToBlackScotService(BlackScotService.ACTION_START);
+                sendActionToBlackScotService(BlackScotService.Action.START_SERVICE);
                 break;
             default:
         }
         // Updates to the tile state will be received trough the broadcast receiver.
     }
 
-    private BroadcastReceiver blackScotServiceStatusReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver blackScotServiceStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
@@ -75,7 +76,7 @@ public class QuickSettingsTileService extends TileService {
         tile.updateTile();
     }
 
-    private void sendActionToBlackScotService(String action) {
-        startService(new Intent(this, BlackScotService.class).setAction(action));
+    private void sendActionToBlackScotService(BlackScotService.Action action) {
+        startService(new Intent(this, BlackScotService.class).setAction(action.getActionString()));
     }
 }

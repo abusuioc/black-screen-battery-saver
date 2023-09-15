@@ -2,9 +2,6 @@ package busu.blackscreenbatterysaver;
 
 import android.util.Log;
 
-/**
- * Created by adibusu on 6/20/16.
- */
 public class LogUtil {
 
     private static boolean canLog() {

@@ -3,7 +3,6 @@ package busu.blackscreenbatterysaver;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
@@ -26,19 +25,14 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
-/**
- * Created by adibusu on 5/14/16.
- */
 public class StarterActivity extends AppCompatActivity {
 
     public final static String ACTION_PREVENT_QUICKSTART = "com.busu.blackscreenbatterysaver.ACTION_PREVENT_QUICK";
 
-    private Preferences mPrefs;
-
     private Button mBtnStartStop, mBtnTutorial;
     private TextView mStatus;
 
-    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
@@ -55,7 +49,6 @@ public class StarterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
-        mPrefs = new Preferences(this);
         if (hasToCancelActivityAndStartService(savedInstanceState != null)) {
             startTheService();
             return;
@@ -64,35 +57,22 @@ public class StarterActivity extends AppCompatActivity {
         setContentView(R.layout.starter);
 
         mBtnStartStop = findViewById(R.id.sBtnStartStop);
-        mBtnStartStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (BlackScotService.state == BlackScotService.State.ACTIVE) {
-                    startTheService(BlackScotService.ACTION_STOP, false);
-                } else {
-                    checkDrawOverlayPermission();
-                }
+        mBtnStartStop.setOnClickListener(v -> {
+            if (BlackScotService.state == BlackScotService.State.ACTIVE) {
+                startTheService(BlackScotService.Action.STOP_SERVICE, false);
+            } else {
+                checkDrawOverlayPermission();
             }
         });
 
         mBtnTutorial = findViewById(R.id.sBtnTutorial);
-        mBtnTutorial.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startTheService(BlackScotService.ACTION_TUTORIAL, true);
-            }
-        });
+        mBtnTutorial.setOnClickListener(v -> startTheService(BlackScotService.Action.SHOW_TUTORIAL, true));
 
         mStatus = findViewById(R.id.sStatus);
 
         final TextView rate = findViewById(R.id.sTxtRate);
         rate.setPaintFlags(rate.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-        rate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openAppRating(StarterActivity.this);
-            }
-        });
+        rate.setOnClickListener(v -> openAppRating(StarterActivity.this));
 
         serviceStatusChanged(BlackScotService.state);
     }
@@ -116,10 +96,7 @@ public class StarterActivity extends AppCompatActivity {
         startIntent.setAction(ACTION_PREVENT_QUICKSTART);
         setIntent(startIntent);
 
-        if (!ACTION_PREVENT_QUICKSTART.equals(startAction) && !isAfterConfigChange) {
-            return true;
-        }
-        return false;
+        return !ACTION_PREVENT_QUICKSTART.equals(startAction) && !isAfterConfigChange;
     }
 
     @Override
@@ -141,13 +118,10 @@ public class StarterActivity extends AppCompatActivity {
         if (!canDrawOverlay(this)) {
             new AlertDialog.Builder(this).setCancelable(true).
                     setMessage(R.string.overlay_enabling_dialog).
-                    setPositiveButton(R.string.overlay_proceed, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                    Uri.parse("package:" + getPackageName()));
-                            startActivityForResult(intent, REQUEST_CODE);
-                        }
+                    setPositiveButton(R.string.overlay_proceed, (dialog, which) -> {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:" + getPackageName()));
+                        startActivityForResult(intent, REQUEST_CODE);
                     }).
                     setNegativeButton(R.string.overlay_cancel, null).
                     create().show();
@@ -175,18 +149,15 @@ public class StarterActivity extends AppCompatActivity {
     }
 
     private void startTheService() {
-        startTheService(BlackScotService.ACTION_START, true);
+        startTheService(BlackScotService.Action.START_SERVICE, true);
     }
 
     /**
-     * Start the service only on action start and send commands for the other actions only if the service is already started
-     *
-     * @param action
-     * @param hasToCloseActivity
+     * Start the service only on action start and send commands for the other actions only if the service is already started.
      */
-    private void startTheService(String action, boolean hasToCloseActivity) {
-        if (action == BlackScotService.ACTION_START || BlackScotService.state == BlackScotService.State.ACTIVE) {
-            startService(new Intent(StarterActivity.this, BlackScotService.class).setAction(action));
+    private void startTheService(BlackScotService.Action action, boolean hasToCloseActivity) {
+        if (action == BlackScotService.Action.START_SERVICE || BlackScotService.state == BlackScotService.State.ACTIVE) {
+            startService(new Intent(StarterActivity.this, BlackScotService.class).setAction(action.getActionString()));
             if (hasToCloseActivity) {
                 finish();
             }

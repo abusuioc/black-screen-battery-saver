@@ -3,7 +3,6 @@ package busu.blackscreenbatterysaver;
 import android.app.Service;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.view.Gravity;
@@ -11,28 +10,43 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/**
- * Created by adibusu on 5/14/16.
- */
-public class BlackScotService extends Service implements ViewPortController.OnTouchEvents {
+import androidx.annotation.NonNull;
 
-    public final static String ACTION_SIZE_1P2 = "1p2";
-    public final static String ACTION_SIZE_1P3 = "1p3";
-    public final static String ACTION_SIZE_FULL = "1full";
-    public final static String ACTION_STOP = "stop";
-    public final static String ACTION_START = "start";
-    public final static String ACTION_READPREFS = "read_prefs";
-    public final static String ACTION_TUTORIAL = "tut";
+public class BlackScotService extends Service implements ViewportController.ViewportInteractionListener {
+
+    enum Action {
+        STOP_SERVICE("stop"),
+        START_SERVICE("start"),
+        SHOW_TUTORIAL("tut");
+
+        private final String mAction;
+
+        Action(String action) {
+            mAction = action;
+        }
+
+        public String getActionString() {
+            return mAction;
+        }
+
+        @NonNull
+        public static Action fromAcceptedActions(String value) {
+            for (Action type : values()) {
+                if (type.getActionString().equals(value)) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("Cannot create from " + value);
+        }
+    }
 
     public static State state = State.STOPPED;
-
     public final static String EVENT_STATUS_CHANGED = "com.busu.blackscreenbatterysaver.STATUS_CHANGED";
     public final static String BROADCAST_CURRENT_STATE = "cst";
 
-    private NotificationsHelper mNotifs;
     private Preferences mPrefs;
 
-    private ViewPortController mVpCtrl;
+    private ViewportController mVpCtrl;
 
     private int mTutorialStep = 0;
     private static final int[] TUTORIAL_STEPS = {R.string.tutorial1, R.string.tutorial2, R.string.tutorial3, R.string.tutorial4, R.string.tutorial5};
@@ -49,9 +63,7 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
         super.onCreate();
 
         mPrefs = new Preferences(this);
-        mNotifs = new NotificationsHelper(this);
-
-        mVpCtrl = new ViewPortController(this, this);
+        mVpCtrl = new ViewportController(this, this);
 
         changeServiceState(State.STANDBY);
     }
@@ -71,18 +83,15 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
             case STANDBY:
                 if (oldState == State.ACTIVE) {
                     removeViewPort();
-                    mNotifs.cancelMainNotification();
                 }
                 break;
             case ACTIVE:
                 addViewPort();
-                mNotifs.startOrUpdateMainNotification(new NotificationsHelper.ChangeHeightSelection(mPrefs.getHoleHeightPercentage()));
                 updateLastTime();
                 break;
             case STOPPED:
                 if (oldState == State.ACTIVE) {
                     removeViewPort();
-                    mNotifs.cancelMainNotification();
                     addSaving();
                     showSavings();
                 }
@@ -95,62 +104,52 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
     public void onDestroy() {
         changeServiceState(State.STOPPED);
         mVpCtrl = null;
-        //force ending of tutorial
+        // Force end of ongoing tutorial because most likely users don't wanna see it again after a restart.
         endTutorial(false);
         super.onDestroy();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            LogUtil.logService("Action received: " + action + " in state: " + state);
-            if (action != null) {
-                if (commandChangeSize(action)) {
-                } else if (action.equals(ACTION_STOP)) {
-                    changeServiceState(State.STOPPED);
-                } else if (action.equals(ACTION_START)) {
-                    changeServiceState(State.ACTIVE);
-                } else if (action.equals(ACTION_READPREFS)) {
-                    mVpCtrl.applyHoleHeigthPercentage(mPrefs.getHoleHeightPercentage());
-                    mVpCtrl.applyHoleVerticalGravity(mPrefs.getHoleGravity());
-                } else if (action.equals(ACTION_TUTORIAL)) {
-                    mTutorialStep = 0;
-                    mPrefs.setHasToShowTutorial(true);
-                    loadTutorial();
-                }
-            }
+        try {
+            executeAction(Action.fromAcceptedActions(intent.getAction()));
+        } catch (Exception e) {
+            LogUtil.logService("Unknown action from starting intent " + intent);
         }
-
         return START_STICKY;
     }
 
-    private boolean commandChangeSize(String action) {
-        int vpHeightPer = Integer.MAX_VALUE;
-        if (action.equals(ACTION_SIZE_1P2)) {
-            vpHeightPer = Preferences.HOLE_HEIGHT_PERCENTAGE_1P2;
-        } else if (action.equals(ACTION_SIZE_1P3)) {
-            vpHeightPer = Preferences.HOLE_HEIGHT_PERCENTAGE_1P3;
-        } else if (action.equals(ACTION_SIZE_FULL)) {
-            vpHeightPer = Preferences.HOLE_HEIGHT_PERCENTAGE_FULL;
-        }
-        //
-        if (vpHeightPer == Integer.MAX_VALUE) {
-            return false;
-        } else {
-            addSaving();
-            //
-            mPrefs.setHoleHeightPercentage(vpHeightPer);
-            mVpCtrl.applyHoleHeigthPercentage(vpHeightPer);
-            mNotifs.startOrUpdateMainNotification(new NotificationsHelper.ChangeHeightSelection(vpHeightPer));
-            return true;
+    private void executeAction(@NonNull Action action) {
+        LogUtil.logService("Execute action: " + action + " in state: " + state);
+        switch (action) {
+            case STOP_SERVICE:
+                changeServiceState(State.STOPPED);
+                break;
+            case START_SERVICE:
+                changeServiceState(State.ACTIVE);
+                break;
+            case SHOW_TUTORIAL:
+                mPrefs.setHasToShowTutorial(true);
+                mTutorialStep = 0;
+                mVpCtrl.showTutorial(TUTORIAL_STEPS[mTutorialStep]);
+                break;
         }
     }
 
+    private void changeViewportSize(Preferences.ViewportHeight size) {
+        addSaving();
+        //
+        mPrefs.setViewportHeight(size);
+        mVpCtrl.applyHoleHeightPercentage(size.getPercentage());
+    }
+
     private void addViewPort() {
-        mVpCtrl.applyHoleHeigthPercentage(mPrefs.getHoleHeightPercentage());
-        mVpCtrl.applyHoleVerticalGravity(mPrefs.getHoleGravity());
-        loadTutorial();
+        mVpCtrl.applyHoleHeightPercentage(mPrefs.getViewportHeight().getPercentage());
+        mVpCtrl.applyHoleVerticalGravity(mPrefs.getViewportGravity());
+        mVpCtrl.setOpacity(mPrefs.isFullOpaque() ? 100 : 90);
+        if (mPrefs.hasToShowTutorial()) {
+            mVpCtrl.showTutorial(TUTORIAL_STEPS[mTutorialStep]);
+        }
         mVpCtrl.addToWindow();
     }
 
@@ -159,20 +158,20 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
     }
 
     @Override
-    public void onBlackClicked(ViewPortController.ViewLayout black, float clickVerticalRatio) {
-        //if black is full screen, the click will quickly restore a 1/2 viewport
-        if (mPrefs.getHoleHeightPercentage() == Preferences.HOLE_HEIGHT_PERCENTAGE_FULL) {
-            commandChangeSize(ACTION_SIZE_1P2);
-            incrementTutorial(true);
+    public void onBlackClicked(ViewportController.ViewLayout black, float clickVerticalRatio) {
+        if (mPrefs.getViewportHeight() == Preferences.ViewportHeight.ZERO) {
+            //if black is full screen, the click will quickly restore a 1/2 viewport
+            changeViewportSize(Preferences.ViewportHeight.HALF);
+            incrementTutorial();
             LogUtil.logService("Click on: " + black.toString() + " while full screen black");
         } else {
             boolean isCenterRequested = (clickVerticalRatio <= 0.5f && black.gravity == Gravity.BOTTOM)
                     || (clickVerticalRatio > 0.5f && black.gravity == Gravity.TOP);
             mVpCtrl.changeHoleGravity(isCenterRequested, black.gravity);
-            mPrefs.setHoleGravity(mVpCtrl.getHoleGravity());
-            incrementTutorial(true);
-            LogUtil.logService("Click on: " + black.toString() + ", center req: " + isCenterRequested + ", hole gravity: "
-                    + ViewPortController.getGravityString(mVpCtrl.getHoleGravity()));
+            mPrefs.setViewportGravity(mVpCtrl.getHoleGravity());
+            incrementTutorial();
+            LogUtil.logService("Click on: " + black + ", center req: " + isCenterRequested + ", hole gravity: "
+                    + ViewportController.getGravityString(mVpCtrl.getHoleGravity()));
         }
     }
 
@@ -182,11 +181,51 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
     }
 
     @Override
+    public void onShowAppClicked() {
+        Intent intent = new Intent(this, StarterActivity.class);
+        intent.setAction(StarterActivity.ACTION_PREVENT_QUICKSTART);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onStartTutorialClicked() {
+        executeAction(Action.SHOW_TUTORIAL);
+    }
+
+    @Override
+    public void onSetHeightToZeroClicked() {
+        changeViewportSize(Preferences.ViewportHeight.ZERO);
+    }
+
+    @Override
+    public void onSetHeightToHalfClicked() {
+        changeViewportSize(Preferences.ViewportHeight.HALF);
+    }
+
+    @Override
+    public void onSetHeightToThirdClicked() {
+        changeViewportSize(Preferences.ViewportHeight.THIRD);
+    }
+
+    @Override
+    public void onSetTransparencyToOpaqueClicked() {
+        mVpCtrl.setOpacity(100);
+        mPrefs.setIsFullOpaque(true);
+    }
+
+    @Override
+    public void onSetTransparencyToSeeThroughClicked() {
+        mVpCtrl.setOpacity(90);
+        mPrefs.setIsFullOpaque(false);
+    }
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         LogUtil.logService("Configuration changed ");
         if (state == State.ACTIVE) {
             removeViewPort();
-            mVpCtrl = new ViewPortController(this, this);
+            mVpCtrl = new ViewportController(this, this);
             addViewPort();
         }
     }
@@ -197,17 +236,11 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
         ACTIVE
     }
 
-    private void loadTutorial() {
-        if (mPrefs.hasToShowTutorial()) {
-            mVpCtrl.showTutorial(TUTORIAL_STEPS[mTutorialStep]);
-        }
-    }
-
-    private void incrementTutorial(boolean hasToUpdateViewController) {
+    private void incrementTutorial() {
         if (mPrefs.hasToShowTutorial()) {
             mTutorialStep++;
             if (mTutorialStep >= TUTORIAL_STEPS.length) {
-                endTutorial(hasToUpdateViewController);
+                endTutorial(true);
             } else {
                 mVpCtrl.showTutorial(TUTORIAL_STEPS[mTutorialStep]);
             }
@@ -236,7 +269,7 @@ public class BlackScotService extends Service implements ViewPortController.OnTo
     }
 
     private void addSaving() {
-        final int blackScreenPercentage = 100 - mPrefs.getHoleHeightPercentage();
+        final int blackScreenPercentage = 100 - mPrefs.getViewportHeight().getPercentage();
         final long timeDiffMs = getTimeDifference();
         final long timeSaved = timeDiffMs * blackScreenPercentage / 100;
         totalSavingMs += timeSaved;
