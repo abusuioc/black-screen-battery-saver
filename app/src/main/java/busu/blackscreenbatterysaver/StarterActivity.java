@@ -32,7 +32,7 @@ public class StarterActivity extends AppCompatActivity {
     private Button mBtnStartStop, mBtnTutorial;
     private TextView mStatus;
 
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mServiceStatusChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
@@ -103,13 +103,13 @@ public class StarterActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         IntentFilter intentFilter = new IntentFilter(BlackScotService.EVENT_STATUS_CHANGED);
-        ContextCompat.registerReceiver(this, mReceiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        ContextCompat.registerReceiver(this, mServiceStatusChangedReceiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(mReceiver);
+        unregisterReceiver(mServiceStatusChangedReceiver);
     }
 
     public final static int REQUEST_CODE = 1;

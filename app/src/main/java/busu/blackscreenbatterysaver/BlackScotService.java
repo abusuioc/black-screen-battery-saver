@@ -75,6 +75,7 @@ public class BlackScotService extends Service implements ViewportController.View
         applyCurrentServiceState(newState, oldState);
         LogUtil.logService("State changed from " + oldState + " to " + newState);
         sendBroadcast(new Intent(EVENT_STATUS_CHANGED)
+                .setPackage(getPackageName())
                 .putExtra(BROADCAST_CURRENT_STATE, newState));
     }
 
