@@ -12,52 +12,83 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by adibusu on 6/25/16.
- */
-public class ViewPortController {
+public class ViewportController {
 
     private final Map<Integer, ViewLayout> mBlacks = new HashMap<>(4);
-    private final OnTouchEvents mClickListener;
+    private final ViewportInteractionListener mClickListener;
     private final WindowManager mWindowManager;
-    private final View mCloseButton;
-    private final Context mContext;
-    //used also as flag whether tutorial should be shown or not
-    private Typeface mTutorialFont;
+    private final View mButtonsLayout;
+    private final Typeface mTutorialFont;
+
+    private boolean mHasToShowTutorial = false;
     @StringRes
-    private int mTutorialText;
+    private int mTutorialStringResId;
 
     //Gravity. TOP, BOTTOM or CENTER
     private int mHoleGravity = Preferences.DEFAULT_HOLE_GRAVITY;
-    private float mHoleHeightRatio = Preferences.DEFAULT_HOLE_HEIGHT_PERCENTAGE / 100f;
+    private float mHoleHeightRatio = Preferences.DEFAULT_HOLE_HEIGHT_PERCENTAGE.getPercentage() / 100f;
 
 
-    public ViewPortController(Context context, OnTouchEvents listener) {
-        mContext = context;
+    public ViewportController(Context context, ViewportInteractionListener listener) {
+
         mBlacks.put(Gravity.TOP, new ViewLayout(context, Gravity.TOP));
         mBlacks.put(Gravity.BOTTOM, new ViewLayout(context, Gravity.BOTTOM));
+
         mClickListener = listener;
         mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        //
-        mCloseButton = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.close_button, null);
-        mCloseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mClickListener.onCloseClicked();
-            }
+
+        mButtonsLayout = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.viewport_buttons_area, null);
+
+        mButtonsLayout.findViewById(R.id.menu_close).setOnClickListener(v -> mClickListener.onCloseClicked());
+        mButtonsLayout.findViewById(R.id.menu_more).setOnClickListener(v -> {
+            PopupMenu moreOptions = new PopupMenu(context, v);
+            moreOptions.inflate(R.menu.viewport);
+            moreOptions.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.menu_viewport_settings:
+                        listener.onShowAppClicked();
+                        return true;
+                    case R.id.menu_viewport_tutorial:
+                        listener.onStartTutorialClicked();
+                        return true;
+                    case R.id.menu_viewport_transparency_opaque:
+                        listener.onSetTransparencyToOpaqueClicked();
+                        return true;
+                    case R.id.menu_viewport_transparency_seethrough:
+                        listener.onSetTransparencyToSeeThroughClicked();
+                        return true;
+                    case R.id.menu_viewport_size_half:
+                        listener.onSetHeightToHalfClicked();
+                        return true;
+                    case R.id.menu_viewport_size_third:
+                        listener.onSetHeightToThirdClicked();
+                        return true;
+                    case R.id.menu_viewport_size_zero:
+                        listener.onSetHeightToZeroClicked();
+                        return true;
+                    default:
+                        return false;
+                }
+            });
+            moreOptions.show();
         });
+
+        mTutorialFont = Typeface.createFromAsset(context.getAssets(),
+                "fonts/nunito_light.ttf");
     }
 
     /**
      * Call to add the blacks to the window; after this or even before,
-     * a call to {@link #applyHoleHeigthPercentage} or {@link #applyHoleVerticalGravity} is ok to configure the blacks
+     * a call to {@link #applyHoleHeightPercentage} or {@link #applyHoleVerticalGravity} is ok to configure the blacks
      */
     public void addToWindow() {
         for (ViewLayout viewLayout : mBlacks.values()) {
@@ -87,7 +118,7 @@ public class ViewPortController {
      *
      * @param percentage [0-100]
      */
-    public void applyHoleHeigthPercentage(int percentage) {
+    public void applyHoleHeightPercentage(int percentage) {
         if (percentage >= 0 && percentage <= 100) {
             mHoleHeightRatio = percentage / 100f;
             applyHolePropertiesChanged();
@@ -149,15 +180,15 @@ public class ViewPortController {
     }
 
     private void positionTutorial() {
-        if (mTutorialFont != null) {
+        if (mHasToShowTutorial) {
             switch (mHoleGravity) {
                 case Gravity.TOP:
-                    mBlacks.get(Gravity.BOTTOM).showTutorial(mTutorialText);
+                    mBlacks.get(Gravity.BOTTOM).showTutorial(mTutorialStringResId);
                     mBlacks.get(Gravity.TOP).hideTutorial();
                     break;
                 case Gravity.CENTER:
                 case Gravity.BOTTOM:
-                    mBlacks.get(Gravity.TOP).showTutorial(mTutorialText);
+                    mBlacks.get(Gravity.TOP).showTutorial(mTutorialStringResId);
                     mBlacks.get(Gravity.BOTTOM).hideTutorial();
                     break;
             }
@@ -165,26 +196,23 @@ public class ViewPortController {
     }
 
     public void showTutorial(@StringRes int tutorialText) {
-        if (mTutorialFont == null) {
-            mTutorialFont = Typeface.createFromAsset(mContext.getAssets(),
-                    "fonts/nunito_light.ttf");
-        }
-        mTutorialText = tutorialText;
+        mTutorialStringResId = tutorialText;
+        mHasToShowTutorial = true;
         positionTutorial();
     }
 
     public void hideTutorial() {
-        mTutorialFont = null;
         for (ViewLayout black : mBlacks.values()) {
             black.hideTutorial();
         }
+        mHasToShowTutorial = false;
     }
 
     private void positionCloseButton() {
         if (mHoleGravity == Gravity.BOTTOM) {
-            mBlacks.get(Gravity.TOP).showCloseButton();
+            mBlacks.get(Gravity.TOP).showButtons();
         } else {
-            mBlacks.get(Gravity.BOTTOM).showCloseButton();
+            mBlacks.get(Gravity.BOTTOM).showButtons();
         }
     }
 
@@ -203,6 +231,16 @@ public class ViewPortController {
                 return "BOTTOM";
         }
         return "UNKNOWN GRAVITY: " + gravity;
+    }
+
+    /**
+     * Sets the opacity for the black areas.
+     * @param percentage 100 is full opaque while 0 is full transparent
+     */
+    public void setOpacity(int percentage) {
+        for (ViewLayout black: mBlacks.values()) {
+            black.setOpacity(percentage);
+        }
     }
 
     public class ViewLayout {
@@ -227,21 +265,21 @@ public class ViewPortController {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     getWindowOverlayType(),
                     getWindowFlags(),
-                    PixelFormat.OPAQUE);
+                    PixelFormat.TRANSLUCENT);
             mLayoutParams.gravity = Gravity.LEFT | gravity;
             disableAnimations();
         }
 
         private int getWindowOverlayType() {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 return WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-            }else{
+            } else {
                 return WindowManager.LayoutParams.TYPE_PHONE;
             }
         }
 
         /**
-         * Use refletion to disable;
+         * Use reflection to disable;
          * In the current setup where only the height changes and the black are laid using gravity, animations do a weird effect
          */
         private void disableAnimations() {
@@ -271,8 +309,8 @@ public class ViewPortController {
 
         private void initView(Context context) {
             mView = new FrameLayout(context);
-            mView.setBackgroundColor(Color.BLACK);
             mView.setWillNotDraw(false);
+            setOpacity(100);
             mView.setOnTouchListener(new View.OnTouchListener() {
                 private static final int MAX_CLICK_DURATION_MS = 1000;
                 private static final int MAX_CLICK_DISTANCE_DP = 15;
@@ -334,23 +372,24 @@ public class ViewPortController {
             }
         }
 
+        @NonNull
         @Override
         public String toString() {
             final String gravityString = getGravityString(gravity);
             return "Black_" + gravityString;
         }
 
-        protected void showCloseButton() {
-            ViewGroup parent = (ViewGroup) mCloseButton.getParent();
+        protected void showButtons() {
+            ViewGroup parent = (ViewGroup) mButtonsLayout.getParent();
             if (parent != null) {
-                parent.removeView(mCloseButton);
+                parent.removeView(mButtonsLayout);
             }
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             lp.gravity = gravity | Gravity.RIGHT;
-            mView.addView(mCloseButton, lp);
+            mView.addView(mButtonsLayout, lp);
         }
 
-        protected void showTutorial(@StringRes int tutorialText) {
+        protected void showTutorial(@StringRes int tutorialStringResId) {
             if (mTutorialBox == null) {
                 mTutorialBox = new TextView(mView.getContext());
                 mTutorialBox.setTypeface(mTutorialFont);
@@ -365,7 +404,7 @@ public class ViewPortController {
                 lp.setMargins(10, 10, 10, 10);
                 mView.addView(mTutorialBox, lp);
             }
-            mTutorialBox.setText(tutorialText);
+            mTutorialBox.setText(tutorialStringResId);
         }
 
         protected void hideTutorial() {
@@ -377,11 +416,31 @@ public class ViewPortController {
                 mTutorialBox = null;
             }
         }
+
+        protected void setOpacity(int percentage) {
+            int alphaValue = (int) (percentage *2.55f) << 24;
+            mView.setBackgroundColor(Color.BLACK & alphaValue);
+        }
     }
 
-    public interface OnTouchEvents {
+    public interface ViewportInteractionListener {
         void onBlackClicked(ViewLayout black, float clickVerticalRatio);
 
         void onCloseClicked();
+
+        void onShowAppClicked();
+
+        void onStartTutorialClicked();
+
+        void onSetHeightToZeroClicked();
+
+        void onSetHeightToHalfClicked();
+
+        void onSetHeightToThirdClicked();
+
+        void onSetTransparencyToOpaqueClicked();
+
+        void onSetTransparencyToSeeThroughClicked();
+
     }
 }
