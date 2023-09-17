@@ -6,23 +6,29 @@
     <string name="status_started">active</string>
     <string name="status_stopped">stopped</string>
 
-    <string name="overlay_enabling_dialog">This service is lowering display power usage by overlapping black pixels on the unused parts of the screen.\n\nFor this to work, you will be prompted next to grant the \'display over other apps\' permission.</string>
+    <string name="overlay_enabling_dialog">BlackScot is reducing the power usage of your screen by overlapping black pixels on the unused parts of the display.\n\nFor this to work, you will be prompted next to grant the \'display over other apps\' permission.</string>
     <string name="overlay_proceed">Proceed</string>
     <string name="overlay_cancel">Cancel</string>
-    <string name="pleaseEnableOverlay">Please grant the \'display over other apps\' permission, so that this service can start conserving battery power.</string>
-    <string name="tutorial1">The service is now active.\nTap here or any black area to continue the tutorial.</string>
+    <string name="pleaseEnableOverlay">Please grant the \'display over other apps\' permission, so that BlackScot can start conserving battery power.</string>
+    <string name="tutorial1">BlackScot is now active.\nTap here or any black area to continue the tutorial.</string>
     <string name="tutorial2">Any tap on black will move the viewport there.\nGive it a try, tap the black!</string>
     <string name="tutorial3">You can interact with the screen, through the viewport, as usual.\nContinue with a tap on any black!</string>
     <string name="tutorial4">Control the viewport height and the black opacity from the settings.\nTap the black!</string>
-    <string name="tutorial5">Stop the service at any time with a tap on \'X\'.\nNow tap the black!</string>
+    <string name="tutorial5">Stop BlackScot at any time with a tap on \'X\'.\nNow tap the black!</string>
     <string name="tutorial6">Please send any suggestion of improvement using Google Play reviews.\nEnjoy! Over and tap out!</string>
     <string name="starter_restart_tutorial">Show tutorial</string>
     <string name="service_status">Status:</string>
-    <string name="welcome">Welcome to the service that helps you save battery power and gain more privacy when reading content on your device</string>
+    <string name="welcome">BlackScot helps you save battery power and gain more privacy when reading content on your device</string>
 
     <string name="starter_rate">Like? Then like also on Google Play!</string>
 
-    <string name="saving">You gained %1$d minutes until your next charge.</string>
+    <string name="saving_last">Last time, %1$s</string>
+    <string name="saving_message">BlackScot ran for %1$d minutes and during this time %2$s</string>
+    <string name="saving_message_less_than_5minutes">Try to use BlackScot for at least 5 minutes to notice battery savings take effect. </string>
+    <string name="saving_maximum">the screen barely drained any power!</string>
+    <string name="saving_percentage_less_30">the screen consumed less than a third of its usual power.</string>
+    <string name="saving_percentage_around_50">the screen utilized roughly half the usual power.</string>
+    <string name="saving_percentage_more_50">the screen used marginally less power than its typical consumption.</string>
 
     <string name="menu_viewport_size_title">Set height</string>
     <string name="menu_viewport_size_0">Zero</string>

@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
@@ -48,6 +47,8 @@ public class BlackScotService extends Service implements ViewportController.View
 
     private ViewportController mVpCtrl;
 
+    private SavingTracker mSavingTracker;
+
     private int mTutorialStep = 0;
     private static final int[] TUTORIAL_STEPS = {
             R.string.tutorial1,
@@ -73,6 +74,7 @@ public class BlackScotService extends Service implements ViewportController.View
 
         mPrefs = new Preferences(this);
         mVpCtrl = new ViewportController(this, this);
+        mSavingTracker = new SavingTracker();
 
         changeServiceState(State.STANDBY);
     }
@@ -97,12 +99,11 @@ public class BlackScotService extends Service implements ViewportController.View
                 break;
             case ACTIVE:
                 addViewPort();
-                updateLastTime();
+                mSavingTracker.recordSaving(mPrefs.getViewportHeight().getPercentage());
                 break;
             case STOPPED:
                 if (oldState == State.ACTIVE) {
                     removeViewPort();
-                    addSaving();
                     showSavings();
                 }
                 stopSelf();
@@ -147,8 +148,7 @@ public class BlackScotService extends Service implements ViewportController.View
     }
 
     private void changeViewportSize(Preferences.ViewportHeight size) {
-        addSaving();
-        //
+        mSavingTracker.recordSaving(size.getPercentage());
         mPrefs.setViewportHeight(size);
         mVpCtrl.applyHoleHeightPercentage(size.getPercentage());
     }
@@ -266,39 +266,37 @@ public class BlackScotService extends Service implements ViewportController.View
     }
 
 
-    private long totalSavingMs;
-    private long lastTime;
-    
-
-    private void updateLastTime() {
-        lastTime = SystemClock.uptimeMillis();
-    }
-
-    private long getTimeDifference() {
-        final long dif = SystemClock.uptimeMillis() - lastTime;
-        return dif < 0 ? 0 : dif;
-    }
-
-    private void addSaving() {
-        final int blackScreenPercentage = 100 - mPrefs.getViewportHeight().getPercentage();
-        final long timeDiffMs = getTimeDifference();
-        final long timeSaved = timeDiffMs * blackScreenPercentage / 100;
-        totalSavingMs += timeSaved;
-        updateLastTime();
-    }
-
-    private final static int MEANINGFUL_SAVING_TIME_MINUTES = 2; //at least 2mins
-
     private void showSavings() {
-        int timeInMins = (int) (totalSavingMs / 60000);
-        if (timeInMins > MEANINGFUL_SAVING_TIME_MINUTES) {
-            View toastView = View.inflate(this, R.layout.saving_toast, null);
-            ((TextView) toastView.findViewById(R.id.saving_text)).setText(getString(R.string.saving, timeInMins));
-            //use this creator because otherwise the LENGTH_LONG is ignored (stupid bug)
-            Toast toast = Toast.makeText(this, R.string.saving, Toast.LENGTH_LONG);
-            toast.setView(toastView);
-            toast.show();
+        mSavingTracker.endSaving();
+        int averagePercentage = mSavingTracker.getPercentageOfScreenUsedSinceSavingStarted();
+        int totalSavingTimeInMinutes = (int) (mSavingTracker.getTotalSavingTime() / 60000);
+
+        LogUtil.logService("Savings - duration: " + totalSavingTimeInMinutes + " & percentage = " + averagePercentage);
+
+        final String message;
+//        if (totalSavingTimeInMinutes <= 5) {
+//            message = getString(R.string.saving_message_less_than_5minutes);
+//        } else {
+            final String percentageMessage = getSavingPercentageMessage(averagePercentage);
+            message = getString(R.string.saving_message, totalSavingTimeInMinutes, percentageMessage);
+//        }
+
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
+        View toastView = View.inflate(this, R.layout.saving_toast, null);
+        ((TextView) toastView.findViewById(R.id.saving_text)).setText(message);
+        toast.setView(toastView);
+        toast.show();
+    }
+
+    private String getSavingPercentageMessage(int averagePercentage) {
+        if (averagePercentage > 60) {
+            return getString(R.string.saving_percentage_more_50);
+        } else if (averagePercentage >= 40) {
+            return getString(R.string.saving_percentage_around_50);
+        } else if (averagePercentage >= 10) {
+            return getString(R.string.saving_percentage_less_30);
+        } else {
+            return getString(R.string.saving_maximum);
         }
-        totalSavingMs = 0;
     }
 }
