@@ -30,7 +30,6 @@ public class StarterActivity extends AppCompatActivity {
     public final static String ACTION_PREVENT_QUICKSTART = "com.busu.blackscreenbatterysaver.ACTION_PREVENT_QUICK";
 
     private Button mBtnStartStop, mBtnTutorial;
-    private TextView mStatus;
 
     private final BroadcastReceiver mServiceStatusChangedReceiver = new BroadcastReceiver() {
         @Override
@@ -67,8 +66,6 @@ public class StarterActivity extends AppCompatActivity {
 
         mBtnTutorial = findViewById(R.id.sBtnTutorial);
         mBtnTutorial.setOnClickListener(v -> startTheService(BlackScotService.Action.SHOW_TUTORIAL, true));
-
-        mStatus = findViewById(R.id.sStatus);
 
         final TextView rate = findViewById(R.id.sTxtRate);
         rate.setPaintFlags(rate.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -166,11 +163,7 @@ public class StarterActivity extends AppCompatActivity {
 
     private void serviceStatusChanged(BlackScotService.State currentState) {
         final boolean isStarted = (BlackScotService.State.ACTIVE == currentState);
-        //
         mBtnStartStop.setText(isStarted ? R.string.btn_stop : R.string.btn_start);
-        mStatus.setText(isStarted ? R.string.status_started : R.string.status_stopped);
-        mStatus.setTextColor(isStarted ? Color.GREEN : Color.RED);
-        //
         if (isStarted) {
             mBtnTutorial.setVisibility(View.VISIBLE);
         } else {

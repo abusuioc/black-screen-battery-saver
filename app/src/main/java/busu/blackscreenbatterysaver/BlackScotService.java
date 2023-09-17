@@ -196,6 +196,7 @@ public class BlackScotService extends Service implements ViewportController.View
         intent.setAction(StarterActivity.ACTION_PREVENT_QUICKSTART);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+        onCloseClicked();
     }
 
     @Override

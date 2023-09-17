@@ -3,8 +3,6 @@
 
     <string name="btn_start">Start</string>
     <string name="btn_stop">Stop</string>
-    <string name="status_started">active</string>
-    <string name="status_stopped">stopped</string>
 
     <string name="overlay_enabling_dialog">BlackScot is reducing the power usage of your screen by overlapping black pixels on the unused parts of the display.\n\nFor this to work, you will be prompted next to grant the \'display over other apps\' permission.</string>
     <string name="overlay_proceed">Proceed</string>
@@ -18,7 +16,7 @@
     <string name="tutorial6">Please send any suggestion of improvement using Google Play reviews.\nEnjoy! Over and tap out!</string>
     <string name="starter_restart_tutorial">Show tutorial</string>
     <string name="service_status">Status:</string>
-    <string name="welcome">BlackScot helps you save battery power and gain more privacy when reading content on your device</string>
+    <string name="welcome">BlackScot helps you save battery power and gain more privacy when reading content on your device.</string>
 
     <string name="starter_rate">Like? Then like also on Google Play!</string>
 
