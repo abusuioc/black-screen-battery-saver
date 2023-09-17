@@ -3,40 +3,35 @@
 
     <string name="btn_start">Start</string>
     <string name="btn_stop">Stop</string>
-    <string name="status_started">started</string>
-    <string name="service_started">Service started</string>
+    <string name="status_started">active</string>
     <string name="status_stopped">stopped</string>
 
-    <string name="overlay_enabling_dialog">The service saves battery by putting screen pixels in off state.\n\nFor this to work, you\'ll be prompted in the next screen to enable the \'drawing over other apps\' permission.</string>
+    <string name="overlay_enabling_dialog">This service is lowering display power usage by overlapping black pixels on the unused parts of the screen.\n\nFor this to work, you will be prompted next to grant the \'display over other apps\' permission.</string>
     <string name="overlay_proceed">Proceed</string>
     <string name="overlay_cancel">Cancel</string>
-    <string name="pleaseEnableOverlay">Please allow drawing on top of other apps, so that the service can start saving battery right away.</string>
-    <string name="tutorial1">The service is now started.\nTo continue the tutorial, tap here or on any black area.</string>
-    <string name="tutorial2">As you\'ve noticed, any tap on black will move the viewport there.\nGive it a try.</string>
-    <string name="tutorial3">You can interact with your original content through the viewport, as usual.</string>
-    <string name="tutorial4">Pressing the \'x\' button will quickly stop the service.\nTap on any black area to continue.</string>
-    <string name="tutorial5">Enjoy this service and please send any suggestions of improvement using the GPlay review system :)</string>
-    <string name="starter_restart_tutorial">Restart tutorial</string>
-    <string name="starter_position_text">On screen starting position:</string>
-    <string name="starter_height_text">Viewport height (% of screen):</string>
+    <string name="pleaseEnableOverlay">Please grant the \'display over other apps\' permission, so that this service can start conserving battery power.</string>
+    <string name="tutorial1">The service is now active.\nTap here or any black area to continue the tutorial.</string>
+    <string name="tutorial2">Any tap on black will move the viewport there.\nGive it a try, tap the black!</string>
+    <string name="tutorial3">You can interact with the screen, through the viewport, as usual.\nContinue with a tap on any black!</string>
+    <string name="tutorial4">Control the viewport height and the black opacity from the settings.\nTap the black!</string>
+    <string name="tutorial5">Stop the service at any time with a tap on \'X\'.\nNow tap the black!</string>
+    <string name="tutorial6">Please send any suggestion of improvement using Google Play reviews.\nEnjoy! Over and tap out!</string>
+    <string name="starter_restart_tutorial">Show tutorial</string>
     <string name="service_status">Status:</string>
-    <string name="welcome">Welcome to the service that helps you save battery and gain more privacy when reading content on your device</string>
-    <string name="settings">Some settings:</string>
+    <string name="welcome">Welcome to the service that helps you save battery power and gain more privacy when reading content on your device</string>
 
     <string name="starter_rate">Like? Then like also on Google Play!</string>
 
-    <string name="saving">Saved %1$d minutes worth of screen time!</string>
-
-    <string name="notifs_channel_descr">___</string>
+    <string name="saving">You gained %1$d minutes until your next charge.</string>
 
     <string name="menu_viewport_size_title">Set height</string>
     <string name="menu_viewport_size_0">Zero</string>
     <string name="menu_viewport_size_half">Half screen</string>
     <string name="menu_viewport_size_third">One third</string>
-    <string name="menu_viewport_tutorial">Tutorial</string>
-    <string name="menu_viewport_settings">Settings</string>
-    <string name="menu_viewport_transparency">Set transparency</string>
-    <string name="menu_viewport_transparency_opaque">Opaque</string>
+    <string name="menu_viewport_tutorial">Restart tutorial</string>
+    <string name="menu_viewport_settings">Show app</string>
+    <string name="menu_viewport_transparency">Set opacity</string>
+    <string name="menu_viewport_transparency_opaque">Full opaque</string>
     <string name="menu_viewport_transparency_seethrough">See through</string>
 
 

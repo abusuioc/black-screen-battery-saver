@@ -49,8 +49,17 @@ public class BlackScotService extends Service implements ViewportController.View
     private ViewportController mVpCtrl;
 
     private int mTutorialStep = 0;
-    private static final int[] TUTORIAL_STEPS = {R.string.tutorial1, R.string.tutorial2, R.string.tutorial3, R.string.tutorial4, R.string.tutorial5};
+    private static final int[] TUTORIAL_STEPS = {
+            R.string.tutorial1,
+            R.string.tutorial2,
+            R.string.tutorial3,
+            R.string.tutorial4,
+            R.string.tutorial5,
+            R.string.tutorial6
+    };
 
+    private final static int OPACITY_FULL = 100;
+    private final static int OPACITY_SEE_THROUGH = 85;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -147,7 +156,7 @@ public class BlackScotService extends Service implements ViewportController.View
     private void addViewPort() {
         mVpCtrl.applyHoleHeightPercentage(mPrefs.getViewportHeight().getPercentage());
         mVpCtrl.applyHoleVerticalGravity(mPrefs.getViewportGravity());
-        mVpCtrl.setOpacity(mPrefs.isFullOpaque() ? 100 : 90);
+        mVpCtrl.setOpacity(mPrefs.isFullOpaque() ? OPACITY_FULL : OPACITY_SEE_THROUGH);
         if (mPrefs.hasToShowTutorial()) {
             mVpCtrl.showTutorial(TUTORIAL_STEPS[mTutorialStep]);
         }
@@ -211,13 +220,13 @@ public class BlackScotService extends Service implements ViewportController.View
 
     @Override
     public void onSetTransparencyToOpaqueClicked() {
-        mVpCtrl.setOpacity(100);
+        mVpCtrl.setOpacity(OPACITY_FULL);
         mPrefs.setIsFullOpaque(true);
     }
 
     @Override
     public void onSetTransparencyToSeeThroughClicked() {
-        mVpCtrl.setOpacity(90);
+        mVpCtrl.setOpacity(OPACITY_SEE_THROUGH);
         mPrefs.setIsFullOpaque(false);
     }
 
@@ -259,6 +268,7 @@ public class BlackScotService extends Service implements ViewportController.View
 
     private long totalSavingMs;
     private long lastTime;
+    
 
     private void updateLastTime() {
         lastTime = SystemClock.uptimeMillis();
