@@ -7,16 +7,16 @@
     <string name="overlay_enabling_dialog">BlackScot is reducing the power usage of your screen by overlapping black pixels on the unused parts of the display.\n\nFor this to work, you will be prompted next to grant the \'display over other apps\' permission.</string>
     <string name="overlay_proceed">Proceed</string>
     <string name="overlay_cancel">Cancel</string>
-    <string name="pleaseEnableOverlay">Please grant the \'display over other apps\' permission, so that BlackScot can start conserving battery power.</string>
+    <string name="pleaseEnableOverlay">Please grant the \'display over other apps\' permission, so that BlackScot can start.</string>
     <string name="tutorial1">BlackScot is now active.\nTap here or any black area to continue the tutorial.</string>
     <string name="tutorial2">Any tap on black will move the viewport there.\nGive it a try, tap the black!</string>
     <string name="tutorial3">You can interact with the screen, through the viewport, as usual.\nContinue with a tap on any black!</string>
     <string name="tutorial4">Control the viewport height and the black opacity from the settings.\nTap the black!</string>
     <string name="tutorial5">Stop BlackScot at any time with a tap on \'X\'.\nNow tap the black!</string>
-    <string name="tutorial6">Please send any suggestion of improvement using Google Play reviews.\nEnjoy! Over and tap out!</string>
+    <string name="tutorial6">Please send any suggestion of improvement with a Google Play review.\nEnjoy! Over and tap out!</string>
     <string name="starter_restart_tutorial">Show tutorial</string>
     <string name="service_status">Status:</string>
-    <string name="welcome">BlackScot helps you save battery power and gain more privacy when reading content on your device.</string>
+    <string name="welcome">BlackScot helps you conserving your device\'s battery life and enhancing your privacy while reading content.</string>
 
     <string name="starter_rate">Like? Then like also on Google Play!</string>
 

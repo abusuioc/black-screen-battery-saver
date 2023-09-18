@@ -27,7 +27,6 @@ public class ViewportController {
     private final ViewportInteractionListener mClickListener;
     private final WindowManager mWindowManager;
     private final View mButtonsLayout;
-    private final Typeface mTutorialFont;
 
     private boolean mHasToShowTutorial = false;
     @StringRes
@@ -82,8 +81,6 @@ public class ViewportController {
             moreOptions.show();
         });
 
-        mTutorialFont = Typeface.createFromAsset(context.getAssets(),
-                "fonts/nunito_light.ttf");
     }
 
     /**
@@ -392,11 +389,10 @@ public class ViewportController {
         protected void showTutorial(@StringRes int tutorialStringResId) {
             if (mTutorialBox == null) {
                 mTutorialBox = new TextView(mView.getContext());
-                mTutorialBox.setTypeface(mTutorialFont);
                 mTutorialBox.setGravity(Gravity.CENTER);
                 mTutorialBox.setSingleLine(false);
                 mTutorialBox.setClickable(false);
-                mTutorialBox.setTextSize(22);
+                mTutorialBox.setTextSize(20);
                 mTutorialBox.setTextColor(Color.LTGRAY);
                 //
                 FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);

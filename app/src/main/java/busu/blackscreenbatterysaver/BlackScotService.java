@@ -275,12 +275,12 @@ public class BlackScotService extends Service implements ViewportController.View
         LogUtil.logService("Savings - duration: " + totalSavingTimeInMinutes + " & percentage = " + averagePercentage);
 
         final String message;
-//        if (totalSavingTimeInMinutes <= 5) {
-//            message = getString(R.string.saving_message_less_than_5minutes);
-//        } else {
+        if (totalSavingTimeInMinutes <= 5) {
+            message = getString(R.string.saving_message_less_than_5minutes);
+        } else {
             final String percentageMessage = getSavingPercentageMessage(averagePercentage);
             message = getString(R.string.saving_message, totalSavingTimeInMinutes, percentageMessage);
-//        }
+        }
 
         Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
         View toastView = View.inflate(this, R.layout.saving_toast, null);
